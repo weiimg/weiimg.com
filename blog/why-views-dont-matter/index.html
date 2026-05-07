@@ -7,20 +7,25 @@
 <title>為什麼觀看數不代表什麼都不是 — WEIIMG</title>
 <link rel="stylesheet" href="../../style.css">
 </head>
-<body>
+<body class="inner-page">
 
 <nav class="nav">
   <a href="../../index.html" class="nav-logo">WEIIMG<span class="reg">*</span><span class="arrow-line"></span></a>
   <div class="nav-items">
-    <span class="has-dropdown">作品
-      <div class="dropdown-menu">
-        <a href="../../brand/index.html">品牌形象</a>
-        <a href="../../shortform/index.html">短影音</a>
-        <a href="../../video/index.html">影像製作</a>
+    <div class="nav-slide-wrap">
+      <div class="nav-slide-inner">
+        <div class="nav-row">
+          <span class="has-dropdown">WORK</span>
+          <a href="../../about/index.html">ABOUT</a>
+          <a href="../index.html" class="active">BLOG</a>
+        </div>
+        <div class="nav-row">
+          <a href="../../brand/index.html">品牌形象</a>
+          <a href="../../shortform/index.html">短影音</a>
+          <a href="../../video/index.html">影像製作</a>
+        </div>
       </div>
-    </span>
-    <a href="../../about/index.html">關於</a>
-    <a href="../index.html" class="active">Blog</a>
+    </div>
     <div class="nav-cta-wrap">
       <span class="nav-cta">FIND ME</span>
       <div class="findme-dropdown">
@@ -57,6 +62,19 @@
 </footer>
 
 <script>
+(() => {
+  const wrap = document.querySelector('.nav-slide-wrap');
+  const trigger = wrap && wrap.querySelector('.has-dropdown');
+  if (!wrap || !trigger) return;
+  let timer;
+  const show = () => { clearTimeout(timer); wrap.classList.add('open'); };
+  const hide = () => { timer = setTimeout(() => wrap.classList.remove('open'), 250); };
+  trigger.addEventListener('mouseenter', show);
+  wrap.addEventListener('mouseleave', hide);
+  wrap.querySelectorAll('.nav-row:last-child a').forEach(a => {
+    a.addEventListener('mouseenter', show);
+  });
+})();
 const logo = document.querySelector('.nav-logo');
 const line = logo && logo.querySelector('.arrow-line');
 const navItems = document.querySelector('.nav-items');

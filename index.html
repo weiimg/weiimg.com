@@ -12,15 +12,20 @@
 <nav class="nav">
   <a href="index.html" class="nav-logo">WEIIMG<span class="reg">*</span><span class="arrow-line"></span></a>
   <div class="nav-items">
-    <span class="has-dropdown">作品
-      <div class="dropdown-menu">
-        <a href="brand/index.html">品牌形象</a>
-        <a href="shortform/index.html">短影音</a>
-        <a href="video/index.html">影像製作</a>
+    <div class="nav-slide-wrap">
+      <div class="nav-slide-inner">
+        <div class="nav-row">
+          <span class="has-dropdown">WORK</span>
+          <a href="about/index.html">ABOUT</a>
+          <a href="blog/index.html">BLOG</a>
+        </div>
+        <div class="nav-row">
+          <a href="brand/index.html">品牌形象</a>
+          <a href="shortform/index.html">短影音</a>
+          <a href="video/index.html">影像製作</a>
+        </div>
       </div>
-    </span>
-    <a href="about/index.html">關於</a>
-    <a href="blog/index.html">Blog</a>
+    </div>
     <div class="nav-cta-wrap">
       <span class="nav-cta">FIND ME</span>
       <div class="findme-dropdown">
@@ -41,7 +46,6 @@
     </div>
     <div class="hero-tagline">
       <div class="hero-micro">concept → content</div>
-      <div class="hero-micro-zh">從策略到執行</div>
     </div>
     <div class="hero-ticker">
       <span>WEIIMG*</span>
@@ -51,74 +55,83 @@
     </div>
     <div class="hero-scroll">
       <span>EXPLORE</span>
-      <span class="arrow">&darr;</span>
+      <div class="hero-scroll-arrow">&darr;</div>
     </div>
   </section>
 
-  <!-- 視差大圖 -->
+  <!-- 視差影片 -->
   <div class="parallax-wrap">
-    <div class="parallax-inner">
-      <div style="font-size:14px;color:var(--gray);">單張大圖 — 16:9 滿版</div>
-      <div style="font-size:11px;color:var(--gray);margin-top:8px;font-style:italic;">Scroll 時圖片水平位移</div>
-    </div>
+    <video class="parallax-video" src="assets/showreel.mp4" autoplay loop muted playsinline></video>
   </div>
 
   <!-- 服務列表 -->
-  <div class="services-detail">
-    <div class="service-row">
-      <div class="service-num"><span class="star">*</span>1</div>
-      <div class="service-body">
-        <span class="service-en">BRAND STRATEGY</span>
-        <h3>品牌策略</h3>
-        <ul>
+  <div class="services-section">
+    <div class="services-nav">
+      <div class="services-nav-inner">
+        <a href="#svc-1" class="svc-nav-item active" data-index="0">
+          <span class="svc-nav-num">01</span>
+          <span class="svc-nav-title">品牌策略</span>
+          <span class="svc-nav-en">Brand Strategy</span>
+        </a>
+        <a href="#svc-2" class="svc-nav-item" data-index="1">
+          <span class="svc-nav-num">02</span>
+          <span class="svc-nav-title">創意內容</span>
+          <span class="svc-nav-en">Creative Content</span>
+        </a>
+        <a href="#svc-3" class="svc-nav-item" data-index="2">
+          <span class="svc-nav-num">03</span>
+          <span class="svc-nav-title">影像製作</span>
+          <span class="svc-nav-en">Film &amp; Motion</span>
+        </a>
+      </div>
+    </div>
+    <div class="services-panels">
+      <div class="svc-panel" id="svc-1">
+        <div class="svc-panel-en">BRAND STRATEGY</div>
+        <h3 class="svc-panel-title">品牌策略</h3>
+        <ul class="svc-panel-list">
           <li>品牌策略與定位</li>
           <li>商業攝影與美術</li>
           <li>視覺設計 / Logo 規劃</li>
           <li>社群內容策劃</li>
         </ul>
-        <a href="brand/index.html" class="service-cta">&rarr;</a>
+        <a href="brand/index.html" class="svc-panel-link">探索作品 &rarr;</a>
       </div>
-    </div>
-    <div class="service-row">
-      <div class="service-num"><span class="star">*</span>2</div>
-      <div class="service-body">
-        <span class="service-en">CREATIVE CONTENT</span>
-        <h3>創意內容</h3>
-        <ul>
+      <div class="svc-panel" id="svc-2">
+        <div class="svc-panel-en">CREATIVE CONTENT</div>
+        <h3 class="svc-panel-title">創意內容</h3>
+        <ul class="svc-panel-list">
           <li>短影音製作</li>
           <li>短影音剪輯</li>
           <li>社群圖文製作</li>
           <li>內容策略規劃</li>
         </ul>
-        <a href="shortform/index.html" class="service-cta">&rarr;</a>
+        <a href="shortform/index.html" class="svc-panel-link">探索作品 &rarr;</a>
       </div>
-    </div>
-    <div class="service-row">
-      <div class="service-num"><span class="star">*</span>3</div>
-      <div class="service-body">
-        <span class="service-en">FILM &amp; MOTION</span>
-        <h3>影像製作</h3>
-        <ul>
+      <div class="svc-panel" id="svc-3">
+        <div class="svc-panel-en">FILM &amp; MOTION</div>
+        <h3 class="svc-panel-title">影像製作</h3>
+        <ul class="svc-panel-list">
           <li>音樂 MV</li>
           <li>紀錄影片</li>
           <li>廣告腳本企劃</li>
           <li>後製調色</li>
         </ul>
-        <a href="video/index.html" class="service-cta">&rarr;</a>
+        <a href="video/index.html" class="svc-panel-link">探索作品 &rarr;</a>
       </div>
     </div>
+  </div>
 
-    <!-- 合作品牌跑馬燈 -->
-    <div class="logo-marquee">
-      <h3>合作品牌</h3>
-      <div class="logo-marquee-track">
-        <div class="logo-marquee-strip">長條圖 Row 1 — 替換為實際圖檔</div>
-        <div class="logo-marquee-strip">長條圖 Row 1 — 替換為實際圖檔</div>
-      </div>
-      <div class="logo-marquee-track reverse">
-        <div class="logo-marquee-strip">長條圖 Row 2 — 替換為實際圖檔</div>
-        <div class="logo-marquee-strip">長條圖 Row 2 — 替換為實際圖檔</div>
-      </div>
+  <!-- 合作品牌跑馬燈 -->
+  <div class="logo-marquee">
+    <h3>合作品牌</h3>
+    <div class="logo-marquee-track">
+      <div class="logo-marquee-strip">長條圖 Row 1 — 替換為實際圖檔</div>
+      <div class="logo-marquee-strip">長條圖 Row 1 — 替換為實際圖檔</div>
+    </div>
+    <div class="logo-marquee-track reverse">
+      <div class="logo-marquee-strip">長條圖 Row 2 — 替換為實際圖檔</div>
+      <div class="logo-marquee-strip">長條圖 Row 2 — 替換為實際圖檔</div>
     </div>
   </div>
 
@@ -132,6 +145,21 @@
 </footer>
 
 <script>
+/* Nav slide dropdown */
+(() => {
+  const wrap = document.querySelector('.nav-slide-wrap');
+  const trigger = wrap && wrap.querySelector('.has-dropdown');
+  if (!wrap || !trigger) return;
+  let timer;
+  const show = () => { clearTimeout(timer); wrap.classList.add('open'); };
+  const hide = () => { timer = setTimeout(() => wrap.classList.remove('open'), 250); };
+  trigger.addEventListener('mouseenter', show);
+  wrap.addEventListener('mouseleave', hide);
+  wrap.querySelectorAll('.nav-row:last-child a').forEach(a => {
+    a.addEventListener('mouseenter', show);
+  });
+})();
+
 /* Nav logo arrow animation */
 const logo     = document.querySelector('.nav-logo');
 const line     = logo && logo.querySelector('.arrow-line');
@@ -155,31 +183,76 @@ if (logo && line && navItems) {
   });
 }
 
-/* Service rows — number reveal on scroll */
+/* Nav: show on scroll, hide on hero & footer */
 (() => {
-  const rows = document.querySelectorAll('.service-row');
+  const nav = document.querySelector('.nav');
+  const hero = document.querySelector('.hero');
+  const footer = document.querySelector('.contact');
+  if (!nav || !hero) return;
+  let heroVisible = true, footerVisible = false;
+  const update = () => nav.classList.toggle('visible', !heroVisible && !footerVisible);
+  new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; update(); }, { threshold: 0 }).observe(hero);
+  if (footer) new IntersectionObserver(([e]) => { footerVisible = e.intersectionRatio > 0.4; update(); }, { threshold: [0, 0.4, 1] }).observe(footer);
+})();
+
+/* Hero brand: mask-out WEIIMG + roll-out star on scroll */
+(() => {
+  const hero = document.querySelector('.hero');
+  const star = document.querySelector('.hero-star');
+  const text = document.querySelector('.hero-text');
+  if (!hero) return;
+
+  if (star) star.addEventListener('animationend', () => { star.style.animation = 'none'; star.style.opacity = '1'; star.style.transform = 'scale(1) rotate(0deg)'; });
+  if (text) text.addEventListener('animationend', () => { text.style.animation = 'none'; text.style.clipPath = 'inset(0 0 0 0)'; });
+
+  window.addEventListener('scroll', () => {
+    const rect = hero.getBoundingClientRect();
+    const h = hero.offsetHeight;
+    const progress = Math.max(0, Math.min(1, -rect.top / h));
+    if (text) text.style.clipPath = `inset(0 0 0 ${progress * 100}%)`;
+    if (star) {
+      star.style.transform = `translateX(${progress * 200}px) rotate(${progress * 360}deg)`;
+      star.style.opacity = 1 - progress;
+    }
+  }, { passive: true });
+})();
+
+/* Services scroll-spy: highlight nav on scroll */
+(() => {
+  const panels = document.querySelectorAll('.svc-panel');
+  const navItems = document.querySelectorAll('.svc-nav-item');
+  if (!panels.length || !navItems.length) return;
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
+      const idx = [...panels].indexOf(entry.target);
+      navItems.forEach(n => n.classList.remove('active'));
+      navItems[idx]?.classList.add('active');
     });
-  }, { threshold: 0.3 });
-  rows.forEach(row => observer.observe(row));
+  }, { rootMargin: '-40% 0px -40% 0px', threshold: 0 });
+  panels.forEach(p => observer.observe(p));
+  navItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(item.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
 })();
 
-/* Parallax scroll */
+/* Video overlay dissolve */
 (() => {
   const wrap = document.querySelector('.parallax-wrap');
-  if (!wrap) return;
-  const inner = wrap.querySelector('.parallax-inner');
+  const hero = document.querySelector('.hero');
+  const video = wrap && wrap.querySelector('.parallax-video');
+  if (!wrap || !hero) return;
 
   function tick() {
-    const maxShift = inner.offsetWidth - wrap.offsetWidth;
-    const rect     = wrap.getBoundingClientRect();
-    const vh       = window.innerHeight;
-    const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
-    inner.style.transform = `translateX(${-progress * maxShift}px)`;
+    const vh = window.innerHeight;
+    const heroBottom = hero.getBoundingClientRect().bottom;
+    const dissolve = Math.max(0, Math.min(1, 1 - heroBottom / vh));
+    wrap.style.setProperty('--overlay-opacity', 1 - dissolve);
+    if (video) video.style.filter = dissolve < 1 ? `blur(${(1 - dissolve) * 12}px)` : 'none';
   }
 
   window.addEventListener('scroll', tick, { passive: true });
