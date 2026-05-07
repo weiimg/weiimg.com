@@ -7,41 +7,115 @@
 <title>(XD) 雲科數媒114級畢業展 — WEIIMG</title>
 <link rel="stylesheet" href="../../style.css">
 <style>
-  .xd-hero {
+  .xd-carousel {
+    position: relative;
     margin: 32px 0 48px;
     background: var(--dark-2);
     overflow: hidden;
+    aspect-ratio: 16 / 9;
+    user-select: none;
   }
-  .xd-hero img { display: block; width: 100%; height: auto; }
-  .xd-gallery {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-    margin-top: 64px;
+  .xd-carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
-  .xd-gallery figure {
-    margin: 0;
+  .xd-carousel-track.dragging { transition: none; }
+  .xd-carousel-slide {
+    flex: 0 0 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--dark-2);
-    overflow: hidden;
   }
-  .xd-gallery img { display: block; width: 100%; height: auto; }
+  .xd-carousel-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  .xd-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.85);
+    color: var(--dark);
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .xd-carousel-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .xd-carousel-btn.prev { left: 16px; }
+  .xd-carousel-btn.next { right: 16px; }
+  .xd-carousel-counter {
+    position: absolute;
+    bottom: 16px;
+    right: 24px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--dark);
+    background: rgba(255,255,255,0.85);
+    padding: 6px 12px;
+    z-index: 5;
+  }
+  .xd-carousel-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 5;
+  }
+  .xd-carousel-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(45,45,45,0.3);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .xd-carousel-dots span.on { background: var(--dark); }
+  .xd-thumbs {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 48px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .xd-thumbs::-webkit-scrollbar { height: 6px; }
+  .xd-thumbs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .xd-thumb {
+    flex: 0 0 88px;
+    height: 60px;
+    background: var(--dark-2);
+    cursor: pointer;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: border-color 0.2s, opacity 0.2s;
+    opacity: 0.6;
+  }
+  .xd-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .xd-thumb:hover { opacity: 1; }
+  .xd-thumb.on { border-color: var(--accent); opacity: 1; }
   .xd-section-title {
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--gray);
-    margin: 64px 0 16px;
-  }
-  .xd-quote {
-    font-size: 18px;
-    line-height: 1.85;
-    color: var(--dark);
-    margin: 24px 0;
-    padding-left: 24px;
-    border-left: 2px solid var(--accent);
-  }
-  @media (min-width: 900px) {
-    .xd-gallery.cols-2 { grid-template-columns: 1fr 1fr; }
+    margin: 0 0 16px;
   }
 </style>
 </head>
@@ -89,8 +163,36 @@
 
       <div class="article-back"><a href="../index.html">&larr; 返回品牌形象</a></div>
 
-      <div class="xd-hero">
-        <img src="img/畢籌作品集_01.jpg" alt="(XD) 主視覺封面">
+      <div class="xd-carousel" id="xdCarousel">
+        <div class="xd-carousel-track">
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_01.jpg" alt="(XD) 主視覺 01"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_04.jpg" alt="(XD) 視覺 04" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_05.jpg" alt="(XD) 視覺 05" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_10.jpg" alt="(XD) 視覺 10" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_13.jpg" alt="(XD) 視覺 13" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_16.jpg" alt="(XD) 視覺 16" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_17.jpg" alt="(XD) 視覺 17" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_18.jpg" alt="(XD) 視覺 18" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_19.jpg" alt="(XD) 視覺 19" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/畢籌作品集_21.jpg" alt="(XD) 視覺 21" loading="lazy"></div>
+        </div>
+        <button class="xd-carousel-btn prev" aria-label="上一張">&larr;</button>
+        <button class="xd-carousel-btn next" aria-label="下一張">&rarr;</button>
+        <div class="xd-carousel-counter"><span class="cur">1</span> / <span class="total">10</span></div>
+        <div class="xd-carousel-dots"></div>
+      </div>
+
+      <div class="xd-thumbs" id="xdThumbs">
+        <div class="xd-thumb on"><img src="img/畢籌作品集_01.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_04.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_05.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_10.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_13.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_16.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_17.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_18.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_19.jpg" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/畢籌作品集_21.jpg" alt="" loading="lazy"></div>
       </div>
 
       <div class="article-body-grid">
@@ -122,23 +224,10 @@
           <p>(XD) 不僅是一個符號，更是我們精神的象徵。在 AI 科技快速發展的時代，我們選擇回歸人本與初心，重新審視生活，以獨特的視角創造藝術與共鳴，表達人性的真實與深度。</p>
           <p>正如文藝復興，擺脫對神的依賴，開啟人本主義的新篇章；而在這數位時代的文藝復興中，我們同樣相信應該回歸人本，專注於人所創造的事物，讓設計成為科技與藝術交匯中承載情感與價值的橋樑，構建屬於這個時代的未來。</p>
 
-          <div class="xd-section-title">主視覺 / Key Visual</div>
+          <div class="xd-section-title" style="margin-top:48px;">主視覺 / Key Visual</div>
           <p>以背景中交融的大腦與電腦為核心，象徵人類從類比思維邁向數位時代的過程，展現技術與創意的碰撞。不規則的破洞設計從 CRT 螢幕延伸而來，貫穿 LCD 螢幕，象徵打破框架，同時也跳出第四面牆，顯現於觀者的觀看載體。</p>
           <p>點陣元素的融入帶回舊型電腦的視覺語言，將復古的記憶與現代設計相結合，引領一場專屬於當代的數位文藝復興。我們以破格的視覺風格強調創新的自由，讓標誌在隨機的變化中依然保留核心的輪廓，兼具偶然與必然。</p>
         </div>
-      </div>
-
-      <div class="xd-section-title" style="margin-top:96px;">視覺延伸 / Gallery</div>
-      <div class="xd-gallery">
-        <figure><img src="img/畢籌作品集_04.jpg" alt="(XD) 視覺延伸 04" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_05.jpg" alt="(XD) 視覺延伸 05" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_10.jpg" alt="(XD) 視覺延伸 10" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_13.jpg" alt="(XD) 視覺延伸 13" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_16.jpg" alt="(XD) 視覺延伸 16" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_17.jpg" alt="(XD) 視覺延伸 17" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_18.jpg" alt="(XD) 視覺延伸 18" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_19.jpg" alt="(XD) 視覺延伸 19" loading="lazy"></figure>
-        <figure><img src="img/畢籌作品集_21.jpg" alt="(XD) 視覺延伸 21" loading="lazy"></figure>
       </div>
 
     </div>
@@ -153,6 +242,83 @@
 </footer>
 
 <script>
+/* Carousel */
+(() => {
+  const root = document.getElementById('xdCarousel');
+  if (!root) return;
+  const track = root.querySelector('.xd-carousel-track');
+  const slides = root.querySelectorAll('.xd-carousel-slide');
+  const prev = root.querySelector('.prev');
+  const next = root.querySelector('.next');
+  const cur = root.querySelector('.cur');
+  const dotsWrap = root.querySelector('.xd-carousel-dots');
+  let idx = 0;
+  const total = slides.length;
+
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('span');
+    if (i === 0) d.classList.add('on');
+    d.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(d);
+  }
+  const dots = dotsWrap.querySelectorAll('span');
+  const thumbs = document.querySelectorAll('#xdThumbs .xd-thumb');
+  thumbs.forEach((t, i) => t.addEventListener('click', () => go(i)));
+
+  function go(n) {
+    idx = (n + total) % total;
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    cur.textContent = idx + 1;
+    dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    thumbs.forEach((t, i) => t.classList.toggle('on', i === idx));
+    const active = thumbs[idx];
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+  prev.addEventListener('click', () => go(idx - 1));
+  next.addEventListener('click', () => go(idx + 1));
+
+  /* Keyboard */
+  root.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') go(idx - 1);
+    if (e.key === 'ArrowRight') go(idx + 1);
+  });
+  root.tabIndex = 0;
+
+  /* Drag / swipe */
+  let startX = 0, dx = 0, dragging = false;
+  const onDown = e => {
+    dragging = true;
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    track.classList.add('dragging');
+  };
+  const onMove = e => {
+    if (!dragging) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    dx = x - startX;
+    const w = root.offsetWidth;
+    track.style.transform = `translateX(calc(-${idx * 100}% + ${dx}px))`;
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove('dragging');
+    const w = root.offsetWidth;
+    if (Math.abs(dx) > w * 0.15) {
+      go(idx + (dx < 0 ? 1 : -1));
+    } else {
+      go(idx);
+    }
+    dx = 0;
+  };
+  root.addEventListener('mousedown', onDown);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  root.addEventListener('touchstart', onDown, { passive: true });
+  root.addEventListener('touchmove', onMove, { passive: true });
+  root.addEventListener('touchend', onUp);
+})();
+
+/* Nav slide */
 (() => {
   const wrap = document.querySelector('.nav-slide-wrap');
   const trigger = wrap && wrap.querySelector('.has-dropdown');
