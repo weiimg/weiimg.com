@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="WEIIMG — 林晉維的創意工作室。品牌策略、創意內容、影像製作，從策略到執行一條龍服務。">
+<title>WEIIMG — Concept → Content</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">WEIIMG<span class="reg">*</span><span class="arrow-line"></span></a>
+  <div class="nav-items">
+    <span class="has-dropdown">作品
+      <div class="dropdown-menu">
+        <a href="brand/index.html">品牌形象</a>
+        <a href="shortform/index.html">短影音</a>
+        <a href="video/index.html">影像製作</a>
+      </div>
+    </span>
+    <a href="about/index.html">關於</a>
+    <a href="blog/index.html">Blog</a>
+    <div class="nav-cta-wrap">
+      <span class="nav-cta">FIND ME</span>
+      <div class="findme-dropdown">
+        <a href="mailto:hi@weiimg.com"><span class="fm-icon">✉</span>hi@weiimg.com</a>
+        <a href="https://instagram.com/wei_img" target="_blank" rel="noopener noreferrer"><span class="fm-icon">📷</span>Instagram</a>
+        <a href="https://threads.net/@wei_img" target="_blank" rel="noopener noreferrer"><span class="fm-icon">🧵</span>Threads</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-brand">
+      <span class="hero-star">*</span><span class="hero-text">WEIIMG</span>
+    </div>
+    <div class="hero-tagline">
+      <div class="hero-micro">concept → content</div>
+      <div class="hero-micro-zh">從策略到執行</div>
+    </div>
+    <div class="hero-ticker">
+      <span>WEIIMG*</span>
+      <span>TPE (TWN)</span>
+      <span>/0026</span>
+      <span>CREATIVE STUDIO_</span>
+    </div>
+    <div class="hero-scroll">
+      <span>EXPLORE</span>
+      <span class="arrow">&darr;</span>
+    </div>
+  </section>
+
+  <!-- 視差大圖 -->
+  <div class="parallax-wrap">
+    <div class="parallax-inner">
+      <div style="font-size:14px;color:var(--gray);">單張大圖 — 16:9 滿版</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:8px;font-style:italic;">Scroll 時圖片水平位移</div>
+    </div>
+  </div>
+
+  <!-- 服務列表 -->
+  <div class="services-detail">
+    <div class="service-row">
+      <div class="service-num"><span class="star">*</span>1</div>
+      <div class="service-body">
+        <span class="service-en">BRAND STRATEGY</span>
+        <h3>品牌策略</h3>
+        <ul>
+          <li>品牌策略與定位</li>
+          <li>商業攝影與美術</li>
+          <li>視覺設計 / Logo 規劃</li>
+          <li>社群內容策劃</li>
+        </ul>
+        <a href="brand/index.html" class="service-cta">&rarr;</a>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="service-num"><span class="star">*</span>2</div>
+      <div class="service-body">
+        <span class="service-en">CREATIVE CONTENT</span>
+        <h3>創意內容</h3>
+        <ul>
+          <li>短影音製作</li>
+          <li>短影音剪輯</li>
+          <li>社群圖文製作</li>
+          <li>內容策略規劃</li>
+        </ul>
+        <a href="shortform/index.html" class="service-cta">&rarr;</a>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="service-num"><span class="star">*</span>3</div>
+      <div class="service-body">
+        <span class="service-en">FILM &amp; MOTION</span>
+        <h3>影像製作</h3>
+        <ul>
+          <li>音樂 MV</li>
+          <li>紀錄影片</li>
+          <li>廣告腳本企劃</li>
+          <li>後製調色</li>
+        </ul>
+        <a href="video/index.html" class="service-cta">&rarr;</a>
+      </div>
+    </div>
+
+    <!-- 合作品牌跑馬燈 -->
+    <div class="logo-marquee">
+      <h3>合作品牌</h3>
+      <div class="logo-marquee-track">
+        <div class="logo-marquee-strip">長條圖 Row 1 — 替換為實際圖檔</div>
+        <div class="logo-marquee-strip">長條圖 Row 1 — 替換為實際圖檔</div>
+      </div>
+      <div class="logo-marquee-track reverse">
+        <div class="logo-marquee-strip">長條圖 Row 2 — 替換為實際圖檔</div>
+        <div class="logo-marquee-strip">長條圖 Row 2 — 替換為實際圖檔</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="contact">
+  <div class="contact-label">Let's collaborate!</div>
+  <div class="contact-email"><a href="mailto:hi@weiimg.com">hi@weiimg.com</a></div>
+  <a href="mailto:hi@weiimg.com" class="contact-cta">FIND ME</a>
+  <div class="contact-copyright">&copy; 2026 林晉維 — weiimg.com</div>
+</footer>
+
+<script>
+/* Nav logo arrow animation */
+const logo     = document.querySelector('.nav-logo');
+const line     = logo && logo.querySelector('.arrow-line');
+const navItems = document.querySelector('.nav-items');
+
+if (logo && line && navItems) {
+  function setArrowWidth() {
+    const lRect = logo.getBoundingClientRect();
+    const nRect = navItems.getBoundingClientRect();
+    line.style.width = Math.max(0, nRect.left - lRect.right - 12) + 'px';
+  }
+  logo.addEventListener('mouseenter', () => {
+    setArrowWidth();
+    logo.classList.remove('arrow-out');
+    logo.classList.add('arrow-in');
+  });
+  logo.addEventListener('mouseleave', () => {
+    logo.classList.remove('arrow-in');
+    logo.classList.add('arrow-out');
+    line.addEventListener('transitionend', () => logo.classList.remove('arrow-out'), { once: true });
+  });
+}
+
+/* Service rows — number reveal on scroll */
+(() => {
+  const rows = document.querySelectorAll('.service-row');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  rows.forEach(row => observer.observe(row));
+})();
+
+/* Parallax scroll */
+(() => {
+  const wrap = document.querySelector('.parallax-wrap');
+  if (!wrap) return;
+  const inner = wrap.querySelector('.parallax-inner');
+
+  function tick() {
+    const maxShift = inner.offsetWidth - wrap.offsetWidth;
+    const rect     = wrap.getBoundingClientRect();
+    const vh       = window.innerHeight;
+    const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
+    inner.style.transform = `translateX(${-progress * maxShift}px)`;
+  }
+
+  window.addEventListener('scroll', tick, { passive: true });
+  tick();
+})();
+</script>
+</body>
+</html>
