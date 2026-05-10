@@ -17,7 +17,7 @@
 body {
   font-family: 'Inter', -apple-system, "Helvetica Neue", sans-serif;
   letter-spacing: -0.05cap;
-  background: #FAFAFA;
+  background: #F3F2F3;
   color: var(--dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,6 +61,8 @@ body.inner-page .nav {
 }
 body.inner-page main {
   padding-top: 87px;
+  max-width: 960px;
+  margin: 0 auto;
 }
 .nav-logo {
   font-size: 14px;
@@ -555,20 +557,26 @@ body.inner-page main {
   transition: border-color 0.3s;
 }
 .brand-card:hover { border-color: var(--accent); }
+.brand-card { isolation: isolate; }
 .brand-card .img-label { font-size: 11px; color: var(--gray); }
 .brand-card .hover-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(46, 91, 255, 0.85);
+  background: rgba(46, 91, 255, 0.75);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  padding: 48px 40px;
   opacity: 0;
-  transition: opacity 0.4s;
+  transition: opacity 0.5s ease-out;
 }
-.brand-card:hover .hover-overlay { opacity: 1; }
+.brand-card:hover .hover-overlay {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
 .brand-card .hover-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
 .brand-card .hover-meta { font-size: 11px; opacity: 0.8; letter-spacing: 0.15em; text-transform: uppercase; }
 .brand-card .bc-tag {
@@ -583,10 +591,26 @@ body.inner-page main {
   transition: opacity 0.3s;
 }
 .brand-card:hover .bc-tag { opacity: 0; }
+.brand-card-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease-out, filter 0.5s ease-out;
+  transform-origin: center center;
+  transform: scale(1);
+  filter: blur(0);
+  will-change: transform, filter;
+}
+.brand-card.has-img:hover .brand-card-img {
+  transform: scale(1.25);
+  filter: blur(5px);
+  transition: transform 0.3s ease-in, filter 0.3s ease-in;
+}
 
 /* DESIGN page: 3-col grid + tighter cards for 15-item layout */
 .brand-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-.brand-grid.cols-3 .brand-card { aspect-ratio: 4/5; }
+.brand-grid.cols-3 .brand-card { aspect-ratio: 1/1; }
 @media (max-width: 720px) {
   .brand-grid.cols-3 { grid-template-columns: 1fr; }
 }
