@@ -17,7 +17,7 @@
 body {
   font-family: 'Inter', -apple-system, "Helvetica Neue", sans-serif;
   letter-spacing: -0.05cap;
-  background: #FAFAFA;
+  background: #F3F2F3;
   color: var(--dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,6 +61,8 @@ body.inner-page .nav {
 }
 body.inner-page main {
   padding-top: 87px;
+  max-width: 960px;
+  margin: 0 auto;
 }
 .nav-logo {
   font-size: 14px;
@@ -555,22 +557,63 @@ body.inner-page main {
   transition: border-color 0.3s;
 }
 .brand-card:hover { border-color: var(--accent); }
+.brand-card { isolation: isolate; }
 .brand-card .img-label { font-size: 11px; color: var(--gray); }
 .brand-card .hover-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(46, 91, 255, 0.85);
+  background: rgba(46, 91, 255, 0.75);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  padding: 48px 40px;
   opacity: 0;
-  transition: opacity 0.4s;
+  transition: opacity 0.5s ease-out;
 }
-.brand-card:hover .hover-overlay { opacity: 1; }
+.brand-card:hover .hover-overlay {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
 .brand-card .hover-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
 .brand-card .hover-meta { font-size: 11px; opacity: 0.8; letter-spacing: 0.15em; text-transform: uppercase; }
+.brand-card .bc-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--gray);
+  text-transform: uppercase;
+  z-index: 1;
+  transition: opacity 0.3s;
+}
+.brand-card:hover .bc-tag { opacity: 0; }
+.brand-card-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease-out, filter 0.5s ease-out;
+  transform-origin: center center;
+  transform: scale(1);
+  filter: blur(0);
+  will-change: transform, filter;
+}
+.brand-card.has-img:hover .brand-card-img {
+  transform: scale(1.25);
+  filter: blur(5px);
+  transition: transform 0.3s ease-in, filter 0.3s ease-in;
+}
+
+/* DESIGN page: 3-col grid + tighter cards for 15-item layout */
+.brand-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.brand-grid.cols-3 .brand-card { aspect-ratio: 1/1; }
+@media (max-width: 720px) {
+  .brand-grid.cols-3 { grid-template-columns: 1fr; }
+}
 
 /* ===== Article Layout (P3) ===== */
 .article-layout {
@@ -925,3 +968,124 @@ body.inner-page main {
 .dots { display: flex; gap: 6px; justify-content: center; margin-top: 16px; }
 .dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--gray); display: block; }
 .dots span.on { background: var(--dark); }
+
+/* ===== Section Label (FILM 區隔 / SHORTS 區隔) ===== */
+.section-label {
+  background: var(--black);
+  color: var(--white);
+  padding: 56px 48px 8px;
+  border-top: 1px solid var(--border);
+}
+.section-label span {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gray);
+  display: inline-block;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ===== FILM Photo Grid ===== */
+.photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 48px 48px 80px;
+  background: var(--black);
+}
+.photo-theme {
+  aspect-ratio: 4/5;
+}
+.photo-sub {
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
+
+/* ===== SHORTS Client Wall ===== */
+.client-wall {
+  padding: 64px 48px 32px;
+  background: var(--black);
+  color: var(--white);
+}
+.client-wall-header { margin-bottom: 32px; }
+.cw-en {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 8px;
+}
+.client-wall-header h3 { font-size: 28px; font-weight: 900; }
+.client-wall-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.client-card {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 140px;
+  transition: border-color 0.3s;
+}
+.client-card:hover { border-color: var(--accent); }
+.client-name { font-size: 20px; font-weight: 900; }
+.client-industry {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-top: 12px;
+}
+
+/* ===== ABOUT Teaching Section ===== */
+.teaching-section {
+  padding: 80px 48px;
+  background: var(--black);
+  color: var(--white);
+  border-top: 1px solid var(--border);
+}
+.teaching-header { margin-bottom: 48px; }
+.teaching-en {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 8px;
+}
+.teaching-header h2 { font-size: 32px; font-weight: 900; }
+.teaching-group { margin-bottom: 40px; }
+.teaching-group-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--gray);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.teaching-list { list-style: none; padding: 0; margin: 0; }
+.teaching-list li {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 14px;
+}
+.t-host { font-weight: 700; }
+.t-topic { color: var(--gray); }
+
+@media (max-width: 720px) {
+  .client-wall-grid { grid-template-columns: 1fr 1fr; }
+  .photo-grid { grid-template-columns: 1fr; }
+  .teaching-list li { grid-template-columns: 1fr; gap: 4px; }
+}
