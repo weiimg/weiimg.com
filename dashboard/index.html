@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="WEIIMG Dashboard — 內部工作系統入口">
+<title>Dashboard — WEIIMG</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* dashboard 專屬樣式（沿用 style.css 變數） */
+  body.dashboard-page {
+    background: #FAFAFA;
+    min-height: 100vh;
+  }
+  body.dashboard-page main {
+    padding: 96px 48px 96px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* 認證未通過前完全不顯示內容（避免閃爍） */
+  .dash-shell { display: none; }
+  body.dashboard-page.authed .dash-shell { display: block; }
+
+  .dash-loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FAFAFA;
+    z-index: 200;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  body.dashboard-page.authed .dash-loading { display: none; }
+
+  /* 頂部：簡化版 nav */
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .dash-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dash-brand-logo {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dark);
+    text-decoration: none;
+  }
+  .dash-brand-logo .reg { color: var(--accent); margin-left: 2px; }
+  .dash-title {
+    font-size: 40px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--dark);
+    margin-top: 8px;
+  }
+  .dash-title-en {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 4px;
+  }
+
+  .dash-user {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--gray);
+  }
+  .dash-user-name { color: var(--dark); font-weight: 500; }
+  .dash-logout {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .dash-logout:hover {
+    border-color: var(--dark);
+    color: var(--dark);
+  }
+
+  /* 區段標題 */
+  .dash-section {
+    margin-bottom: 64px;
+  }
+  .dash-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .dash-section-num {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gray-light);
+    font-variant-numeric: tabular-nums;
+  }
+  .dash-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dark);
+  }
+  .dash-section-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* 卡片網格 */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .dash-card {
+    background: #FAFAFA;
+    padding: 28px 24px 24px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 180px;
+    transition: background 0.2s ease;
+    position: relative;
+  }
+  .dash-card:hover {
+    background: #FFFFFF;
+  }
+  .dash-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+  }
+  .dash-card-arrow {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+  }
+  .dash-card:hover .dash-card-arrow {
+    transform: translate(2px, -2px);
+  }
+  .dash-card-title {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--dark);
+    margin-top: auto;
+  }
+  .dash-card-en {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  .dash-card-desc {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+  .dash-card-external::after {
+    content: '↗';
+    position: absolute;
+    top: 28px;
+    right: 24px;
+    font-size: 12px;
+    color: var(--gray-light);
+  }
+
+  /* RWD */
+  @media (max-width: 900px) {
+    .dash-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    body.dashboard-page main { padding: 64px 24px 64px; }
+    .dash-grid { grid-template-columns: 1fr; }
+    .dash-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .dash-title { font-size: 32px; }
+  }
+</style>
+</head>
+<body class="dashboard-page">
+
+<div class="dash-loading">verifying access…</div>
+
+<div class="dash-shell">
+
+<main>
+
+  <header class="dash-header">
+    <div class="dash-brand">
+      <a href="../index.html" class="dash-brand-logo">WEIIMG<span class="reg">*</span></a>
+      <div class="dash-title-en">CONTROL PANEL</div>
+      <h1 class="dash-title">Dashboard</h1>
+    </div>
+    <div class="dash-user">
+      <span>SIGNED IN AS <span class="dash-user-name" id="userName">—</span></span>
+      <button class="dash-logout" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <!-- 對外頁面 -->
+  <section class="dash-section">
+    <div class="dash-section-head">
+      <span class="dash-section-num">01</span>
+      <span class="dash-section-title">Public Pages</span>
+      <span class="dash-section-rule"></span>
+    </div>
+    <div class="dash-grid">
+
+      <a href="../about/index.html" class="dash-card">
+        <div class="dash-card-meta">
+          <span>/about</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+        <div class="dash-card-en">About</div>
+        <div class="dash-card-title">關於</div>
+        <div class="dash-card-desc">個人介紹、經歷與作品說明。</div>
+      </a>
+
+      <a href="../blog/index.html" class="dash-card">
+        <div class="dash-card-meta">
+          <span>/blog</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+        <div class="dash-card-en">Blog</div>
+        <div class="dash-card-title">部落格</div>
+        <div class="dash-card-desc">文章、筆記與創作隨想。</div>
+      </a>
+
+      <a href="../brand/index.html" class="dash-card">
+        <div class="dash-card-meta">
+          <span>/brand</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+        <div class="dash-card-en">Brand</div>
+        <div class="dash-card-title">品牌形象</div>
+        <div class="dash-card-desc">品牌策略、視覺設計案例。</div>
+      </a>
+
+      <a href="../shortform/index.html" class="dash-card">
+        <div class="dash-card-meta">
+          <span>/shortform</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+        <div class="dash-card-en">Shortform</div>
+        <div class="dash-card-title">短影音</div>
+        <div class="dash-card-desc">直式短影音作品集。</div>
+      </a>
+
+      <a href="../video/index.html" class="dash-card">
+        <div class="dash-card-meta">
+          <span>/video</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+        <div class="dash-card-en">Video</div>
+        <div class="dash-card-title">影像製作</div>
+        <div class="dash-card-desc">商業影片、形象片案例。</div>
+      </a>
+
+      <a href="../活動紀錄/index.html" class="dash-card">
+        <div class="dash-card-meta">
+          <span>/活動紀錄</span>
+          <span class="dash-card-arrow">→</span>
+        </div>
+        <div class="dash-card-en">Events</div>
+        <div class="dash-card-title">活動紀錄</div>
+        <div class="dash-card-desc">現場活動與紀實攝影。</div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- 內部工具 -->
+  <section class="dash-section">
+    <div class="dash-section-head">
+      <span class="dash-section-num">02</span>
+      <span class="dash-section-title">Internal Tools</span>
+      <span class="dash-section-rule"></span>
+    </div>
+    <div class="dash-grid">
+
+      <a href="https://review.weiimg.com" class="dash-card dash-card-external" target="_blank" rel="noopener">
+        <div class="dash-card-meta">
+          <span>review.weiimg.com</span>
+        </div>
+        <div class="dash-card-en">57UDIO Review</div>
+        <div class="dash-card-title">影片審片系統</div>
+        <div class="dash-card-desc">客戶審片、留言、版本管理。</div>
+      </a>
+
+    </div>
+  </section>
+
+</main>
+
+</div>
+
+<script>
+(function () {
+  const LOGIN_URL = 'https://review.weiimg.com/login.html';
+  const NEXT_URL  = window.location.href;
+
+  function redirectToLogin() {
+    const url = `${LOGIN_URL}?next=${encodeURIComponent(NEXT_URL)}`;
+    window.location.replace(url);
+  }
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
+
+      if (!res.ok) {
+        redirectToLogin();
+        return;
+      }
+
+      const user = await res.json();
+      document.getElementById('userName').textContent = user.name || user.email || 'user';
+      document.body.classList.add('authed');
+    } catch (err) {
+      console.error('[Dashboard] 認證檢查失敗：', err);
+      redirectToLogin();
+    }
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+      await fetch('https://review.weiimg.com/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('[Dashboard] 登出請求失敗：', err);
+    } finally {
+      redirectToLogin();
+    }
+  });
+
+  checkAuth();
+})();
+</script>
+
+</body>
+</html>
