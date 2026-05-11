@@ -1,5 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Inter:wght@100;300;400;500;700;900&display=swap');
 
+/* ============================================================
+   Page transitions
+   ------------------------------------------------------------
+   Two-tier strategy:
+   1. Modern browsers (Chrome / Edge / Safari) honor the
+      @view-transition rule and cross-fade between documents
+      automatically — zero JS, runs even on hard navigations.
+   2. Older browsers fall back to a body fade-in keyframe so the
+      arriving page still eases in instead of slamming.
+   When View Transitions are supported the keyframe is suppressed
+   so the two effects don't stack.
+   ============================================================ */
+@view-transition { navigation: auto; }
+
+/* Leaving page: fade out */
+::view-transition-old(root) {
+  animation: vtFadeOut 0.25s ease-in both;
+}
+/* Arriving page: fade + subtle slide up */
+::view-transition-new(root) {
+  animation: vtFadeSlideIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes vtFadeOut {
+  to { opacity: 0; }
+}
+@keyframes vtFadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Body-level fade-in runs on every page load.
+   On Chrome/Edge/Safari, @view-transition above also runs a cross-
+   fade between document snapshots — both effects coexist cleanly
+   since VT operates on pseudo-element snapshots, not the real body.
+   On Firefox (no cross-doc VT yet) this becomes the only animation,
+   so arrivals still ease in instead of slamming. */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+body {
+  animation: pageFadeIn 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  body { animation: none; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
+
 :root {
   --black: #F5F5F3;
   --dark: #2D2D2D;
@@ -329,7 +378,6 @@ body.inner-page main {
 /* ===== Parallax (P1) ===== */
 .parallax-wrap {
   overflow: hidden;
-  border-top: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -361,6 +409,8 @@ body.inner-page main {
   background: var(--black);
   color: var(--dark);
   min-height: 100vh;
+  /* full-bleed background, inner content capped at 1200px */
+  padding-inline: max(0px, calc((100% - 1200px) / 2));
 }
 .services-nav {
   position: sticky;
