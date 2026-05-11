@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報價單系統 | 57UDIO</title>
+    
+    <link rel="icon" href="https://cdn.weiimg.com/quote_icon.png" type="image/png">
+    <link rel="shortcut icon" href="https://cdn.weiimg.com/quote_icon.png" type="image/png">
+
+    <meta property="og:title" content="報價單系統 | 57UDIO">
+    <meta property="og:description" content="make a quotation.">
+    <meta property="og:image" content="https://cdn.weiimg.com/quote_icon.png">
+    <meta property="og:url" content="https://weiimg.com/quote">
+    <meta property="og:type" content="website">
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* --- Markdown 渲染樣式 (修正 Tailwind Reset 造成的樣式消失) --- */
+        .markdown-body ul { list-style-type: disc; padding-left: 1.2em; margin-bottom: 0.5em; }
+        .markdown-body ol { list-style-type: decimal; padding-left: 1.2em; margin-bottom: 0.5em; }
+        .markdown-body strong { font-weight: 700; color: #000; }
+        .markdown-body p { margin-bottom: 0.5em; }
+        .markdown-body p:last-child { margin-bottom: 0; }
+        .markdown-body a { color: #2563eb; text-decoration: underline; }
+        
+        /* --- 列印設定修正 --- */
+        @media print {
+            .no-print { display: none !important; }
+            
+            body, html, #root {
+                background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: 100%;
+            }
+
+            .print-area { 
+                display: block !important; 
+                position: absolute !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                width: 100% !important; 
+                height: 100% !important;
+                margin: 0 !important; 
+                padding: 0 !important; 
+                background-color: white !important;
+                overflow: visible !important;
+                z-index: 9999;
+            }
+
+            .A4 {
+                width: 100% !important;
+                min-height: 297mm !important;
+                height: auto !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                transform: none !important;
+                background-color: white !important;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .print\:bg-white {
+                background-color: white !important;
+            }
+            
+            .print\:text-white {
+                color: white !important;
+            }
+            
+            .print\:bg-black {
+                background-color: black !important;
+            }
+
+            .print\:text-black {
+                color: black !important;
+            }
+
+            @page { size: A4; margin: 0; }
+        }
+
+        .A4 {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* 拖曳時的樣式 */
+        .dragging-item {
+            opacity: 0.5;
+            background: #4b5563;
+        }
+        .drag-handle {
+            cursor: grab;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+
+        // --- Icons ---
+        const Plus = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        );
+
+        const Trash2 = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+        );
+
+        const Printer = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+        );
+
+        const Download = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        );
+
+        const Upload = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        );
+        
+        const GripVertical = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="5" r="1"></circle>
+                <circle cx="9" cy="19" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="5" r="1"></circle>
+                <circle cx="15" cy="19" r="1"></circle>
+            </svg>
+        );
+
+        const Copy = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+        );
+
+        const Check = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        );
+
+        const Maximize2 = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+        );
+
+        const Edit3 = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+        );
+
+        // --- 樣板資料 ---
+        const TERMS_TEMPLATES = {
+            visual: [
+                "報價內容為報價日起 **30 天內有效**，若逾期限，則需重新報價。",
+                "本專案酬勞總額為新台幣 **5000 元整**（未稅），報價內容為報價日起 30 天內有效，若逾期限，則需重新報價。",
+                "甲方須於項目完成後，**60 個工作天內匯款**，若未在時間內完成付款，則須重新報價。",
+                "本專案各階段皆有 **3 次修改額度**。若因應需求超過該次數，將另酌收修改費新台幣 3,000 元整，且後續修改額度改為不限次數。",
+                "甲⽅收到設計圖後，須⾃收到設計圖起 **5 ⽇內確認回覆**，如甲⽅審核稿件逾 5 ⽇，⼄⽅後續交稿時間將依甲⽅所逾⽇數順延。如甲⽅於期限內未審核稿件，若經⼄⽅信件催告 14 天後，仍未獲得甲⽅信件回覆，專案將終⽌，且甲方不得使用乙方設計物。",
+                "如甲⽅應提供專案所需之素材或資料，( 如⽂案、圖片、特殊需求）供⼄⽅製作使⽤，⽽甲⽅未按照約定時間提供，⼄⽅交稿時間將延後，⼄⽅並於收到資料後與甲⽅另外約定交稿時間。",
+                "⼄⽅如未按雙⽅約定時間交付稿件導致專案延宕，除非⼄⽅遇天災⼈禍之不可抗⼒因素，否則甲⽅有權要求⼄⽅退還已付款項。",
+                "專案進⾏期間，如甲⽅因故 (除⼄⽅違反合約外) 需暫停或終⽌本合約，不同階段處理⽅式如下：\n① 於草稿製作期間 (從簽約起到第⼀次設計圖提案⽇) 終⽌或暫停，作品著作權仍歸屬⼄⽅。\n② 設計圖提案後，於設計圖修改期間終⽌或暫停，甲⽅應⽀付本專案總價之 80%，作品著作權仍歸屬⼄⽅。\n③ 於設計圖修改完後終⽌或暫停，甲⽅應⽀付本專案總價之 100%，作品著作權將歸屬甲⽅。",
+                "雙方知悉並同意，雙方合作相關內容須保密，非經雙方同意不得任意對外透漏，如有未盡事項另依約定執行。"
+            ],
+            video: [
+                "報價內容為報價日起 **30 天內有效**，若逾期限，則需重新報價。",
+                "本合約專案自付款完成後啟動執行，單期費用為新台幣 **4,000 元整**。甲方須於成片完成後，**30 個工作天內匯款**，若未在時間內完成付款，則須重新報價。",
+                "本專案約定製作影片數量如上開約定，完成後本約即終止，若需續約由雙方另議。",
+                "本專案雙方約定，乙方拍攝完畢後，且甲方提供素材（品牌 Logo 等）後，由乙方進行排程，每條影片製作時間預定為 **5 個工作天**，並依據影片條數累加計算，乙方將於收到素材後 **3 個工作天內**告知甲方排程製作時間及預訂完成時間，實際成品交付若因故延遲，雙方得另協調約定之，若遇素材需補拍則不在此限，雙方另視情況約定；若因甲方未提供素材或延遲提供時間，以致乙方無法如期完成製作，不視為乙方違約。",
+                "本專案經簽訂後，自報價日起算六個月內須完成，超出六個月期限甲方仍未提交素材即視同甲方放棄權利，乙方不退還款項。",
+                "乙方提交成品給甲方後，甲方須於 **10 個工作天內完成驗收**。乙方同意給予甲方每條影片修改上限為 **3 次**，修改內容不得更動影片主架構；甲方請求如逾越 3 次修改，每新增 1 次由雙方討論後增加修改費用，始得修改。",
+                "雙方知悉並同意，雙方合作相關內容須保密，非經雙方同意不得任意對外透漏。",
+                "如有未盡事項另依約定執行。",
+                "請匯款至以下指定帳戶並提供匯款憑證以利核對。"
+            ],
+            general: [
+                "報價內容為報價日起 **30天內有效**，若逾期限，則需重新報價。",
+                "本合約專案自訂金付款完成後啟動執行，訂金費用為總金額之 **30%** (或由雙方另議)。甲方須於成片完成後，30個工作天內匯款剩餘款項，若未在時間內完成付款，則須重新報價。",
+                "本專案約定製作影片數量如上開約定，完成後本約即終止，若需續約由雙方另議。",
+                "本專案雙方約定，乙方拍攝完畢後，且甲方提供素材(品牌Logo等)後，由乙方進行排程，乙方將於收到素材後3個工作天內告知甲方排程製作時間及預訂完成時間，實際成品交付若因故延遲，雙方得另協調約定之，若遇素材需補拍則不在此限，雙方另視情況約定；若因甲方未提供素材或延遲提供時間，以致乙方無法如期完成製作，不視為乙方違約。",
+                "本專案經簽訂後，自報價日起算六個月內須完成，超出六個月期限甲方仍未提交素材即視同甲方放棄權利，乙方不退還款項。",
+                "乙方提交成品給甲方後，甲方須於10個工作天內完成驗收。乙方同意給予甲方每條影片修改上限為 **2次**，修改內容不得更動影片主架構；甲方請求如逾越2次修改，每新增1次由雙方討論後增加修改費用，始得修改。",
+                "雙方知悉並同意，雙方合作相關內容須保密，非經雙方同意不得任意對外透漏，如有未盡事項另依約定執行。",
+                "請匯款至以下指定帳戶並提供匯款憑證以利核對。"
+            ]
+        };
+
+        const BANK_OPTIONS = [
+            {
+                id: 'company',
+                label: '公司帳戶 (合庫)',
+                bankName: "合作金庫銀行大里分行(006)",
+                accountName: "昇頡廣告設計工程行",
+                accountNumber: "1025-717-079503"
+            },
+            {
+                id: 'personal',
+                label: '個人帳戶 (中信)',
+                bankName: "中國信託大里分行 (822)",
+                accountName: "林晉維",
+                accountNumber: "5654-0156-196"
+            },
+            {
+                id: 'none',
+                label: '不顯示',
+                bankName: "",
+                accountName: "",
+                accountNumber: ""
+            }
+        ];
+
+        // --- StackEdit Helper Function ---
+        const openStackEdit = (content, onSave) => {
+            const stackedit = new StackEdit();
+            stackedit.openFile({
+                name: 'Markdown Editor',
+                content: {
+                    text: content || ''
+                }
+            });
+
+            stackedit.on('fileChange', (file) => {
+                onSave(file.content.text);
+            });
+        };
+
+        // --- Markdown Renderer Component (使用 marked.js) ---
+        const MarkdownRenderer = ({ text, className = "" }) => {
+            // 使用 useMemo 避免不必要的重複解析
+            const html = useMemo(() => {
+                if (!text) return "";
+                return marked.parse(text, { breaks: true }); // breaks: true 支援單行換行
+            }, [text]);
+
+            return (
+                <div 
+                    className={`markdown-body ${className}`} 
+                    dangerouslySetInnerHTML={{ __html: html }} 
+                />
+            );
+        };
+
+        const AutoResizeTextarea = React.forwardRef(({ value, onChange, onKeyDown, placeholder, className, rows = 1, autoFocus }, ref) => {
+            const innerRef = useRef(null);
+            useEffect(() => {
+                if (ref) {
+                    if (typeof ref === 'function') ref(innerRef.current);
+                    else ref.current = innerRef.current;
+                }
+            }, [ref]);
+
+            useEffect(() => {
+                if (innerRef.current) {
+                    innerRef.current.style.height = 'auto';
+                    innerRef.current.style.height = innerRef.current.scrollHeight + 'px';
+                }
+            }, [value]);
+
+            useEffect(() => {
+                if (autoFocus && innerRef.current) {
+                    innerRef.current.focus();
+                }
+            }, [autoFocus]);
+
+            return (
+                <textarea
+                    ref={innerRef}
+                    value={value}
+                    onChange={onChange}
+                    onKeyDown={onKeyDown}
+                    placeholder={placeholder}
+                    className={`${className} overflow-hidden resize-none box-border block`}
+                    rows={rows}
+                />
+            );
+        });
+
+        const CopyFilenameButton = ({ filename }) => {
+            const [copied, setCopied] = useState(false);
+            const handleCopy = () => {
+                navigator.clipboard.writeText(filename).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                });
+            };
+            return (
+                <button 
+                    onClick={handleCopy} 
+                    className={`
+                        w-6 h-6 flex items-center justify-center rounded transition-all duration-300
+                        ${copied 
+                            ? "bg-green-500 text-white shadow-sm" 
+                            : "bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white"
+                        }
+                    `}
+                    title="複製檔名"
+                >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+            );
+        };
+
+        const TermsEditorArea = ({ termsList, updateTerm, handleTermKeyDown, removeTerm, onDragStart, onDragOver, onDragEnd, focusIndex, setRef, fontSizeClass = "text-sm", isActive }) => {
+            return (
+                <div className="space-y-1">
+                    {termsList.map((term, index) => (
+                        <div 
+                            key={term.id} 
+                            className="group flex items-start gap-2 p-1 rounded hover:bg-gray-700/50 transition-colors relative"
+                            draggable
+                            onDragStart={(e) => onDragStart(e, index)}
+                            onDragOver={(e) => onDragOver(e, index)}
+                            onDragEnd={onDragEnd}
+                        >
+                            <div className="drag-handle text-gray-500 hover:text-gray-300 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <GripVertical size={16} />
+                            </div>
+                            
+                            <div className={`pt-2 font-mono text-gray-400 w-5 text-right shrink-0 select-none ${fontSizeClass === "text-lg" ? "text-base pt-3" : "text-xs"}`}>
+                                {index + 1}.
+                            </div>
+
+                            <div className="flex-grow flex gap-2">
+                                <AutoResizeTextarea
+                                    ref={el => {
+                                        if (isActive) setRef(index, el);
+                                    }}
+                                    value={term.text}
+                                    onChange={(e) => updateTerm(index, e.target.value)}
+                                    onKeyDown={(e) => handleTermKeyDown(e, index)}
+                                    placeholder="條款內容..."
+                                    className={`w-full bg-transparent ${fontSizeClass} text-gray-200 focus:outline-none font-mono leading-relaxed`}
+                                    autoFocus={isActive && focusIndex === index}
+                                />
+                                <button 
+                                    onClick={() => openStackEdit(term.text, (newVal) => updateTerm(index, newVal))}
+                                    className="text-gray-500 hover:text-blue-400 pt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="使用 StackEdit 編輯"
+                                >
+                                    <Edit3 size={16} />
+                                </button>
+                            </div>
+
+                            <button 
+                                onClick={() => removeTerm(index)}
+                                className="text-gray-600 hover:text-red-400 pt-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <Trash2 size={14} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const DEFAULT_COMPANY = {
+                name: "昇頡廣告設計工程行",
+                services: "影音製作, 動畫設計, 視覺形象",
+                contact: "林晉維",
+                phone: "0988 304 165",
+                email: "hi@weiimg.com",
+                taxId: "", 
+                address: "台中市大里區仁化里仁堤路8號", 
+                bankName: BANK_OPTIONS[0].bankName,
+                accountName: BANK_OPTIONS[0].accountName,
+                accountNumber: BANK_OPTIONS[0].accountNumber
+            };
+
+            const LOGO_URL = "https://cdn.weiimg.com/57udio_logo_s.png";
+            const SIDEBAR_LOGO_URL = "https://cdn.weiimg.com/57udio_logo_s.png";
+
+            const [company, setCompany] = useState(DEFAULT_COMPANY);
+            const [selectedBankId, setSelectedBankId] = useState('company');
+            const [enableTax, setEnableTax] = useState(true);
+            
+            const [client, setClient] = useState({
+                name: "", contact: "", phone: "", email: "", address: ""
+            });
+
+            const getTodayString = () => {
+                const d = new Date();
+                const offset = d.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(d - offset)).toISOString().slice(0, 10);
+                return localISOTime;
+            };
+
+            const todayStr = getTodayString();
+            const validDateObj = new Date();
+            validDateObj.setDate(new Date().getDate() + 30);
+            const offset = validDateObj.getTimezoneOffset() * 60000;
+            const validDateStr = (new Date(validDateObj - offset)).toISOString().slice(0, 10);
+
+            const [quoteInfo, setQuoteInfo] = useState({
+                number: "",
+                date: todayStr,
+                validDate: validDateStr
+            });
+
+            const [items, setItems] = useState([
+                { id: 1, name: "", description: "", quantity: "", price: "" }
+            ]);
+
+            const [termsList, setTermsList] = useState(
+                TERMS_TEMPLATES.general.map((text, index) => ({ id: Date.now() + index, text }))
+            );
+            
+            const fileInputRef = useRef(null);
+            const termsInputRefs = useRef([]); 
+            const [focusIndex, setFocusIndex] = useState(null);
+            const [draggedItemIndex, setDraggedItemIndex] = useState(null);
+
+            const subtotal = items.reduce((sum, item) => sum + ((Number(item.quantity) || 0) * (Number(item.price) || 0)), 0);
+            const tax = enableTax ? Math.round(subtotal * 0.05) : 0;
+            const total = subtotal + tax;
+
+            const sanitizeFilename = (str) => {
+                return str ? str.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_") : "";
+            };
+            const currentFilename = useMemo(() => {
+                const qNum = sanitizeFilename(quoteInfo.number) || "Draft";
+                const cName = sanitizeFilename(client.name) || "Client";
+                const pName = sanitizeFilename(items[0]?.name) || "Project";
+                const dStr = sanitizeFilename(quoteInfo.date);
+                return `${qNum}_${cName}_${pName}_${dStr}.json`.replace('.json', ''); 
+            }, [quoteInfo, client, items]);
+
+            const handleBankChange = (e) => {
+                const newBankId = e.target.value;
+                setSelectedBankId(newBankId);
+                const bankData = BANK_OPTIONS.find(b => b.id === newBankId);
+                if (bankData) {
+                    setCompany(prev => ({
+                        ...prev,
+                        bankName: bankData.bankName,
+                        accountName: bankData.accountName,
+                        accountNumber: bankData.accountNumber
+                    }));
+                }
+            };
+
+            const handleItemChange = (id, field, value) => {
+                setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
+            };
+            const addItem = () => {
+                const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1;
+                setItems([...items, { id: newId, name: "", description: "", quantity: "", price: "" }]);
+            };
+            const removeItem = (id) => {
+                if (items.length === 1) return;
+                setItems(items.filter(item => item.id !== id));
+            };
+
+            useEffect(() => {
+                if (focusIndex !== null && termsInputRefs.current[focusIndex]) {
+                    termsInputRefs.current[focusIndex].focus();
+                    setFocusIndex(null); 
+                }
+            }, [focusIndex, termsList]); 
+
+            const setTermRef = (index, el) => {
+                termsInputRefs.current[index] = el;
+            };
+
+            const addTerm = (index) => {
+                const newTerms = [...termsList];
+                const insertIndex = index !== undefined ? index + 1 : newTerms.length;
+                newTerms.splice(insertIndex, 0, { id: Date.now(), text: "" });
+                setTermsList(newTerms);
+                setFocusIndex(insertIndex); 
+            };
+
+            const removeTerm = (index) => {
+                if (termsList.length <= 1 && index === 0) {
+                    setTermsList([{ id: Date.now(), text: "" }]);
+                    return;
+                }
+                const newTerms = termsList.filter((_, i) => i !== index);
+                setTermsList(newTerms);
+                setFocusIndex(Math.max(0, index - 1));
+            };
+
+            const updateTerm = (index, value) => {
+                const newTerms = [...termsList];
+                newTerms[index].text = value;
+                setTermsList(newTerms);
+            };
+
+            const handleTermKeyDown = (e, index) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    addTerm(index);
+                } else if (e.key === 'Backspace' && termsList[index].text === '' && termsList.length > 1) {
+                    e.preventDefault();
+                    removeTerm(index);
+                } else if (e.key === 'ArrowUp' && index > 0) {
+                    setFocusIndex(index - 1);
+                } else if (e.key === 'ArrowDown' && index < termsList.length - 1) {
+                    setFocusIndex(index + 1);
+                }
+            };
+
+            const onDragStart = (e, index) => {
+                setDraggedItemIndex(index);
+                e.dataTransfer.effectAllowed = "move";
+            };
+
+            const onDragOver = (e, index) => {
+                e.preventDefault();
+                if (draggedItemIndex === null || draggedItemIndex === index) return;
+                const newTerms = [...termsList];
+                const draggedItem = newTerms[draggedItemIndex];
+                newTerms.splice(draggedItemIndex, 1);
+                newTerms.splice(index, 0, draggedItem);
+                setTermsList(newTerms);
+                setDraggedItemIndex(index);
+            };
+
+            const onDragEnd = () => {
+                setDraggedItemIndex(null);
+            };
+
+            const loadTemplate = (type) => {
+                if (confirm("這將會覆蓋目前的注意事項內容，確定嗎？")) {
+                    const templateStrings = TERMS_TEMPLATES[type] || TERMS_TEMPLATES.general;
+                    setTermsList(templateStrings.map((text, index) => ({ id: Date.now() + index, text })));
+                }
+            };
+
+            const exportData = () => {
+                const data = {
+                    client, quoteInfo, items, termsList, enableTax, selectedBankId, timestamp: new Date().toISOString()
+                };
+                const fileName = `${currentFilename}.json`;
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            };
+
+            const importData = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (data.client) setClient(data.client);
+                        if (data.quoteInfo) setQuoteInfo(data.quoteInfo);
+                        if (data.items) setItems(data.items);
+                        if (data.enableTax !== undefined) setEnableTax(data.enableTax);
+                        if (data.selectedBankId) {
+                            setSelectedBankId(data.selectedBankId);
+                            const bankData = BANK_OPTIONS.find(b => b.id === data.selectedBankId);
+                            if (bankData) {
+                                setCompany(prev => ({...prev, bankName: bankData.bankName, accountName: bankData.accountName, accountNumber: bankData.accountNumber}));
+                            }
+                        }
+                        if (data.termsList) {
+                            setTermsList(data.termsList);
+                        } else if (data.termsText) {
+                            const lines = data.termsText.split('\n').filter(line => line.trim() !== '');
+                            setTermsList(lines.map((t, i) => ({ id: Date.now() + i, text: t.replace(/^\d+\.\s*/, '') })));
+                        }
+                        alert("報價單資料已成功載入！");
+                    } catch (error) {
+                        console.error(error);
+                        alert("檔案格式錯誤，無法載入。");
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            };
+
+            const handlePrint = () => window.print();
+
+            return (
+                <div className="min-h-screen flex flex-col md:flex-row bg-gray-100 font-sans text-gray-800">
+
+                    {/* 左側：編輯介面 */}
+                    <div className="w-full md:w-5/12 bg-gray-800 text-white p-0 overflow-y-auto h-screen no-print shadow-xl z-10 custom-scrollbar relative flex flex-col">
+                        
+                        {/* Header */}
+                        <div className="sticky top-0 z-50 bg-gray-800 border-b border-gray-600 px-6 py-4 shadow-md">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                                        <img src={SIDEBAR_LOGO_URL} alt="s7udio" className="h-8 object-contain" />
+                                        <span className="text-sm font-normal text-gray-400">報價系統</span>
+                                    </h2>
+                                    <div className="flex items-center gap-3 mt-2">
+                                        <div className="flex items-center gap-2 bg-gray-900/50 px-2 py-1 rounded border border-gray-700">
+                                            <span className="text-xs text-gray-400 font-mono truncate max-w-[120px]" title={currentFilename}>
+                                                {currentFilename}
+                                            </span>
+                                            <CopyFilenameButton filename={currentFilename} />
+                                        </div>
+
+                                        <div className="h-4 w-[1px] bg-gray-600"></div>
+
+                                        <div className="flex gap-2">
+                                            <button onClick={exportData} className="text-[10px] bg-blue-900/50 hover:bg-blue-800/50 border border-blue-700 text-blue-100 px-2 py-1 rounded flex items-center gap-1 transition-colors">
+                                                <Download size={12} /> JSON
+                                            </button>
+                                            <label className="text-[10px] bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded flex items-center gap-1 transition-colors border border-gray-500 cursor-pointer text-gray-200">
+                                                <Upload size={12} /> 讀取
+                                                <input type="file" className="hidden" accept=".json" onChange={importData} ref={fileInputRef} />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition-colors shadow-lg text-sm font-medium">
+                                    <Printer size={18} /> 列印 / PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* 內容區塊 */}
+                        <div className="p-6 space-y-8 pb-10 flex-grow">
+                            {/* 設定與客戶 */}
+                            <section className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-300 border-l-4 border-yellow-500 pl-2">基本設定</h3>
+                                    <div className="flex gap-4 mb-3">
+                                        <label className="flex items-center gap-2 bg-gray-700 p-2 rounded cursor-pointer text-sm flex-1">
+                                            <input type="checkbox" checked={enableTax} onChange={(e) => setEnableTax(e.target.checked)} className="rounded text-blue-500" />
+                                            啟用 5% 稅額
+                                        </label>
+                                    </div>
+                                    <div className="bg-gray-700 p-2 rounded">
+                                        <label className="text-xs text-gray-400 block mb-1">匯款帳戶選擇</label>
+                                        <select 
+                                            value={selectedBankId} 
+                                            onChange={handleBankChange}
+                                            className="w-full bg-gray-800 text-white text-sm rounded px-2 py-1.5 border border-gray-600 focus:outline-none focus:border-blue-500"
+                                        >
+                                            {BANK_OPTIONS.map(opt => (
+                                                <option key={opt.id} value={opt.id}>{opt.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-300 border-l-4 border-yellow-500 pl-2">客戶資料</h3>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        <input type="text" placeholder="客戶公司名稱" value={client.name} onChange={(e) => setClient({...client, name: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-blue-500 focus:outline-none" />
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <input type="text" placeholder="聯絡人" value={client.contact} onChange={(e) => setClient({...client, contact: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-blue-500 focus:outline-none" />
+                                            <input type="text" placeholder="電話" value={client.phone} onChange={(e) => setClient({...client, phone: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-blue-500 focus:outline-none" />
+                                        </div>
+                                        <input type="text" placeholder="信箱" value={client.email} onChange={(e) => setClient({...client, email: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-blue-500 focus:outline-none" />
+                                        <input type="text" placeholder="地址" value={client.address} onChange={(e) => setClient({...client, address: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-blue-500 focus:outline-none" />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* 報價資訊 */}
+                            <section>
+                                <h3 className="text-lg font-semibold mb-4 text-gray-300 border-l-4 border-yellow-500 pl-2">報價單資訊</h3>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <label className="text-xs text-gray-400 block mb-1">單號</label>
+                                        <input type="text" placeholder="No." value={quoteInfo.number} onChange={(e) => setQuoteInfo({...quoteInfo, number: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-green-500 focus:outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-400 block mb-1">日期</label>
+                                        <input type="date" value={quoteInfo.date} onChange={(e) => setQuoteInfo({...quoteInfo, date: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-green-500 focus:outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-400 block mb-1">有效至</label>
+                                        <input type="date" value={quoteInfo.validDate} onChange={(e) => setQuoteInfo({...quoteInfo, validDate: e.target.value})} className="w-full bg-gray-700 rounded px-3 py-2 border border-gray-600 focus:border-green-500 focus:outline-none" />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* 項目 */}
+                            <section>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-300 border-l-4 border-yellow-500 pl-2">報價項目</h3>
+                                    <button onClick={addItem} className="bg-green-600 hover:bg-green-700 text-xs px-3 py-1.5 rounded flex items-center gap-1">
+                                        <Plus size={14} /> 新增
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {items.map((item, index) => (
+                                        <div key={item.id} className="bg-gray-700/40 p-4 rounded-lg border border-gray-600">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="bg-gray-600 text-[10px] px-2 py-0.5 rounded text-gray-300">#{index + 1}</span>
+                                                <button onClick={() => removeItem(item.id)} className="text-gray-500 hover:text-red-400 p-1"><Trash2 size={16} /></button>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <input type="text" placeholder="項目名稱" value={item.name} onChange={(e) => handleItemChange(item.id, 'name', e.target.value)} className="w-full bg-gray-800 rounded px-3 py-2 border border-gray-600 text-white font-medium focus:border-yellow-500 focus:outline-none" />
+                                                <div className="flex gap-2 items-start">
+                                                    <AutoResizeTextarea placeholder="細節說明 (支援 Markdown 語法)" value={item.description} onChange={(e) => handleItemChange(item.id, 'description', e.target.value)} className="w-full bg-gray-800 rounded px-3 py-2 border border-gray-600 text-sm focus:border-yellow-500 focus:outline-none font-mono" />
+                                                    <button 
+                                                        onClick={() => openStackEdit(item.description, (newVal) => handleItemChange(item.id, 'description', newVal))}
+                                                        className="bg-gray-600 hover:bg-blue-600 text-gray-200 p-2 rounded transition-colors mt-1"
+                                                        title="使用 StackEdit 編輯"
+                                                    >
+                                                        <Edit3 size={16} />
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="text-[10px] text-gray-400">數量</label>
+                                                        <input 
+                                                            type="number" 
+                                                            placeholder="數量" 
+                                                            value={item.quantity} 
+                                                            onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} 
+                                                            className="w-full bg-gray-800 rounded px-2 py-1 border border-gray-600 focus:border-yellow-500 focus:outline-none placeholder-gray-600" 
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] text-gray-400">單價</label>
+                                                        <input 
+                                                            type="number" 
+                                                            placeholder="單價" 
+                                                            value={item.price} 
+                                                            onChange={(e) => handleItemChange(item.id, 'price', e.target.value)} 
+                                                            className="w-full bg-gray-800 rounded px-2 py-1 border border-gray-600 focus:border-yellow-500 focus:outline-none placeholder-gray-600" 
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* 注意事項 (Block Editor) */}
+                            <section>
+                                <div className="flex flex-col gap-2 mb-4">
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="text-lg font-semibold text-gray-300 border-l-4 border-yellow-500 pl-2">注意事項條款</h3>
+                                    </div>
+                                    <div className="flex gap-2 text-[10px]">
+                                        <button onClick={() => loadTemplate('visual')} className="bg-gray-600 hover:bg-gray-500 px-2 py-1 rounded text-gray-200 border border-gray-500">載入: 視覺設計</button>
+                                        <button onClick={() => loadTemplate('video')} className="bg-gray-600 hover:bg-gray-500 px-2 py-1 rounded text-gray-200 border border-gray-500">載入: 影片製作</button>
+                                        <button onClick={() => loadTemplate('general')} className="bg-gray-600 hover:bg-gray-500 px-2 py-1 rounded text-gray-200 border border-gray-500">載入: 通用</button>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-gray-700/30 rounded-lg p-2 border border-gray-600 space-y-1 relative pt-8">
+                                    <TermsEditorArea 
+                                        termsList={termsList}
+                                        updateTerm={updateTerm}
+                                        handleTermKeyDown={handleTermKeyDown}
+                                        removeTerm={removeTerm}
+                                        onDragStart={onDragStart}
+                                        onDragOver={onDragOver}
+                                        onDragEnd={onDragEnd}
+                                        focusIndex={focusIndex}
+                                        setRef={setTermRef}
+                                        isActive={true} 
+                                    />
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    {/* 右側：A4 預覽區 */}
+                    <div className="w-full md:w-7/12 bg-gray-500 p-8 overflow-y-auto h-screen print-area">
+                        <div className="A4 relative flex flex-col justify-between text-black">
+                            {/* Header */}
+                            <header className="bg-[#0d0d0c] text-white px-8 pt-10 pb-6 flex justify-between items-end mb-6 relative z-10 print:bg-black">
+                                <div>
+                                    <img src={LOGO_URL} alt="Company Logo" className="h-14 mb-2 object-contain" />
+                                    <div className="flex items-center gap-3">
+                                        <h2 className="text-lg font-bold tracking-wide border-r-2 border-gray-400/50 pr-3 print:text-white print:border-gray-600">{company.name}</h2>
+                                        <div className="text-xs font-medium text-gray-300 print:text-white">
+                                            {company.services.split(',').map(s => <span key={s} className="mr-2">{s}</span>)}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-right text-sm text-gray-300 space-y-1 print:text-white">
+                                    <p>{company.contact} / {company.phone}</p>
+                                    <p>{company.email}</p>
+                                </div>
+                            </header>
+                            
+                            <div className="px-10 flex-grow">
+                                <div className="flex justify-between mb-6 gap-10">
+                                    <div className="w-1/2">
+                                        <h3 className="font-bold border-b border-gray-800 mb-2 pb-1 text-black text-xs uppercase tracking-wide">客戶資料 Client</h3>
+                                        <div className="space-y-1 text-xs leading-relaxed">
+                                            <p className="flex"><span className="font-medium w-20 text-gray-500 shrink-0">客戶名稱</span> <span className="font-bold">{client.name || '—'}</span></p>
+                                            <p className="flex"><span className="font-medium w-20 text-gray-500 shrink-0">聯絡人</span> <span>{client.contact || '—'}</span></p>
+                                            <p className="flex"><span className="font-medium w-20 text-gray-500 shrink-0">電話</span> <span>{client.phone || '—'}</span></p>
+                                            <p className="flex"><span className="font-medium w-20 text-gray-500 shrink-0">信箱</span> <span>{client.email || '—'}</span></p>
+                                            <p className="flex"><span className="font-medium w-20 text-gray-500 shrink-0">地址</span> <span>{client.address || '—'}</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-1/2 flex flex-col items-end">
+                                        <h3 className="font-bold border-b border-gray-800 mb-2 pb-1 text-black text-xs uppercase tracking-wide text-right w-full">報價單詳情 Details</h3>
+                                        <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-xs leading-relaxed w-fit">
+                                            <div className="font-medium text-gray-500 text-right">報價單號</div>
+                                            <div className="font-bold text-base text-left">{quoteInfo.number || '—'}</div>
+                                            <div className="font-medium text-gray-500 text-right">報價日期</div>
+                                            <div className="text-left">{quoteInfo.date}</div>
+                                            <div className="font-medium text-gray-500 text-right">有效日期</div>
+                                            <div className="text-left">{quoteInfo.validDate}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <table className="w-full mb-6 table-fixed">
+                                        <thead>
+                                            <tr className="border-b-2 border-black">
+                                                <th className="py-2 text-left w-10 text-sm font-bold text-gray-700">#</th>
+                                                <th className="py-2 text-left w-[25%] text-sm font-bold text-gray-700">專案項目</th>
+                                                <th className="py-2 text-left text-sm font-bold text-gray-700">細節說明</th>
+                                                <th className="py-2 text-center w-12 text-sm font-bold text-gray-700">數量</th>
+                                                <th className="py-2 text-right w-20 text-sm font-bold text-gray-700">單價</th>
+                                                <th className="py-2 text-right w-24 text-sm font-bold text-gray-700">總價</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-sm">
+                                            {items.map((item, index) => (
+                                                <tr key={item.id} className="border-b border-gray-100 last:border-0">
+                                                    <td className="py-3 align-top text-gray-400 text-xs">{index + 1}</td>
+                                                    <td className="py-3 align-top font-bold text-gray-800">{item.name}</td>
+                                                    <td className="py-3 align-top text-gray-600 text-xs leading-relaxed pr-2">
+                                                        <MarkdownRenderer text={item.description} />
+                                                    </td>
+                                                    <td className="py-3 align-top text-center text-gray-600">{item.quantity}</td>
+                                                    <td className="py-3 align-top text-right text-gray-600">${(Number(item.price) || 0).toLocaleString()}</td>
+                                                    <td className="py-3 align-top text-right font-bold text-black">${((Number(item.quantity)||0) * (Number(item.price)||0)).toLocaleString()}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    <div className="flex justify-end mb-8">
+                                        <div className="w-60">
+                                            <div className="flex justify-between text-sm text-gray-600 mb-1">
+                                                <span>小計 Subtotal</span>
+                                                <span>${subtotal.toLocaleString()}</span>
+                                            </div>
+                                            {enableTax && (
+                                                <div className="flex justify-between text-sm text-gray-600 mb-2 pb-1 border-b border-gray-300">
+                                                    <span>營業稅 Tax (5%)</span>
+                                                    <span>${tax.toLocaleString()}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-baseline">
+                                                <span className="text-lg font-bold text-gray-800">總計 Total</span>
+                                                <span className="text-2xl font-black text-black">${total.toLocaleString()}</span>
+                                            </div>
+                                            <div className="text-right text-[10px] text-gray-400 mt-1">
+                                                {enableTax ? "(含稅價格)" : "(未稅價格)"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <footer className="mt-auto px-10 pb-10">
+                                <div className="grid grid-cols-2 gap-8 border-t-2 border-black pt-4">
+                                    <div className="text-[9px] leading-relaxed text-gray-600 text-justify">
+                                        <h4 className="font-bold mb-2 text-black text-xs">注意事項 Terms & Conditions</h4>
+                                        <ol className="list-decimal list-outside pl-3 space-y-1">
+                                            {termsList.map((term) => (
+                                                <li key={term.id} className="pl-1">
+                                                    <MarkdownRenderer text={term.text} />
+                                                </li>
+                                            ))}
+                                        </ol>
+                                    </div>
+                                    <div className="flex flex-col justify-between text-xs h-full">
+                                        {/* 匯款資訊 */}
+                                        {selectedBankId !== 'none' && (
+                                            <div className="bank-info-box bg-gray-50 p-3 border-l-4 border-blue-800 mb-4 print:bg-white">
+                                                <h4 className="font-bold mb-1 text-blue-900 border-b border-blue-200 pb-1 print:text-black">匯款資訊 Bank Info</h4>
+                                                <p className="font-medium text-gray-700 mb-0.5">{company.bankName}</p>
+                                                <p className="text-gray-600 mb-0.5">戶名：{company.accountName}</p>
+                                                <p className="font-mono text-lg tracking-wider text-black font-bold">{company.accountNumber}</p>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="flex justify-between items-end mt-auto gap-4">
+                                            <div className="text-center">
+                                                 <div className="w-24 h-16 border-b border-gray-400 mb-1"></div>
+                                                 <span className="text-[10px] text-gray-500">客戶簽章 Signature</span>
+                                            </div>
+
+                                            <div className="flex flex-col items-end gap-2">
+                                                {selectedBankId !== 'none' && (
+                                                    <div className="w-24 h-24 border border-gray-200 border-dashed rounded flex items-center justify-center text-center p-2 print:border-gray-800">
+                                                        <span className="text-[10px] text-gray-300 transform -rotate-12 print:text-gray-400">公司用印處<br/>Company Stamp</span>
+                                                    </div>
+                                                )}
+                                                {company.taxId && <p className="text-[10px] text-gray-400">統編: {company.taxId}</p>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-center text-[9px] text-gray-300 mt-4 pt-2">
+                                    © {new Date().getFullYear()} {company.brand} weiimg 報價單製作日期：{new Date().toLocaleString('zh-TW')}
+                                </div>
+                            </footer>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
