@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="WEIIMG 短影音作品集 — 腳本企劃、拍攝剪輯、數據分析與帳號經營。">
 <title>短影音 — WEIIMG</title>
-<link rel="stylesheet" href="../style.css">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body class="inner-page">
 
@@ -20,9 +22,9 @@
           <a href="../blog/index.html">BLOG</a>
         </div>
         <div class="nav-row">
-          <a href="../brand/index.html">品牌形象</a>
-          <a href="index.html">短影音</a>
-          <a href="../video/index.html">影像製作</a>
+          <a href="../design/index.html">DESIGN</a>
+          <a href="../film/index.html">FILM</a>
+          <a href="index.html">SHORTS</a>
         </div>
       </div>
     </div>
@@ -43,22 +45,49 @@
     <h2>短影音</h2>
   </div>
 
+  <section class="client-wall">
+    <div class="client-wall-header">
+      <div class="cw-en">LONG-TERM CLIENTS</div>
+      <h3>長期合作客戶</h3>
+    </div>
+    <div class="client-wall-grid">
+      <div class="client-card">
+        <div class="client-name">樂飛潮玩</div>
+        <div class="client-industry">玩具店</div>
+      </div>
+      <div class="client-card">
+        <div class="client-name">詠豐電子</div>
+        <div class="client-industry">電子製造</div>
+      </div>
+      <div class="client-card">
+        <div class="client-name">凱旋臺中</div>
+        <div class="client-industry">重機</div>
+      </div>
+      <div class="client-card">
+        <div class="client-name">中驥聯合</div>
+        <div class="client-industry">重機</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-label"><span>所有合作影片 ／ ALL CLIPS</span></div>
+
   <div class="filter-bar">
     <button class="filter-tag active" data-filter="all">全部</button>
-    <button class="filter-tag" data-filter="美食">美食</button>
-    <button class="filter-tag" data-filter="商業活動">商業活動</button>
-    <button class="filter-tag" data-filter="旅遊">旅遊</button>
-    <button class="filter-tag" data-filter="日常">日常</button>
-    <button class="filter-tag" data-filter="電子科技">電子科技</button>
+    <button class="filter-tag" data-filter="餐飲">餐飲</button>
+    <button class="filter-tag" data-filter="電子製造">電子製造</button>
+    <button class="filter-tag" data-filter="不動產">不動產</button>
+    <button class="filter-tag" data-filter="重機">重機</button>
+    <button class="filter-tag" data-filter="玩具店">玩具店</button>
   </div>
 
   <div class="work-grid">
-    <div class="work-card" data-tag="商業活動"><span class="work-card-tag">商業活動</span><div class="work-card-title">福芳臺菜 — 200萬</div></div>
-    <div class="work-card" data-tag="電子科技"><span class="work-card-tag">電子科技</span><div class="work-card-title">詠豐電子 — 30+ 則短影音</div></div>
-    <div class="work-card" data-tag="日常"><span class="work-card-tag">日常</span><div class="work-card-title">住商不動產 — 13萬</div></div>
-    <div class="work-card" data-tag="美食"><span class="work-card-tag">美食</span><div class="work-card-title">凱旋重車</div></div>
-    <div class="work-card" data-tag="旅遊"><span class="work-card-tag">旅遊</span><div class="work-card-title">樂飛潮玩 — 2.5萬</div></div>
-    <div class="work-card" data-tag="商業活動"><span class="work-card-tag">商業活動</span><div class="work-card-title">福芳臺菜 — 續約</div></div>
+    <div class="work-card video" data-tag="餐飲"><span class="work-card-tag">餐飲</span><div class="work-card-title">福芳臺菜</div></div>
+    <div class="work-card video" data-tag="電子製造"><span class="work-card-tag">電子製造</span><div class="work-card-title">詠豐電子</div></div>
+    <div class="work-card video" data-tag="不動產"><span class="work-card-tag">不動產</span><div class="work-card-title">住商不動產</div></div>
+    <div class="work-card video" data-tag="重機"><span class="work-card-tag">重機</span><div class="work-card-title">凱旋臺中</div></div>
+    <div class="work-card video" data-tag="重機"><span class="work-card-tag">重機</span><div class="work-card-title">中驥聯合</div></div>
+    <div class="work-card video" data-tag="玩具店"><span class="work-card-tag">玩具店</span><div class="work-card-title">樂飛潮玩</div></div>
   </div>
 </main>
 
@@ -107,5 +136,6 @@ document.querySelectorAll('.filter-tag').forEach(btn => {
   });
 });
 </script>
+<script src="/nav.js?v=3"></script>
 </body>
 </html>
