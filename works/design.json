@@ -9,8 +9,17 @@
   "items": [
     {
       "tag": "品牌識別",
+      "title": "樂飛潮玩 品牌識別優化",
+      "meta": "樂飛潮玩, 2024",
+      "href": "/design/liffestore-rebranding/",
+      "cover": "/design/liffestore-rebranding/img/liffestore-rebranding-01.webp"
+    },
+    {
+      "tag": "品牌識別",
       "title": "詠豐電子 品牌識別優化",
-      "meta": "詠豐電子材料, 2025"
+      "meta": "2025",
+      "href": "/design/yfe-branding/",
+      "cover": "/design/yfe-branding/img/yfe-branding-01.webp"
     },
     {
       "tag": "主視覺",
