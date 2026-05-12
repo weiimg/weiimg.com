@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from html import escape
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -122,6 +123,15 @@ button:hover { background:#333; }
 .manage-actions button.danger:hover:not(:disabled) { background:#ffebee; }
 .cover-btn { padding:6px 10px; background:#fff; color:#111; border:1px solid #ddd; border-radius:3px; font-size:12px; cursor:pointer; display:inline-block; line-height:1; }
 .cover-btn:hover { background:#f5f5f5; }
+.img-preview { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin-top:8px; }
+.img-thumb { border:1px solid #ddd; border-radius:4px; overflow:hidden; cursor:grab; background:#fff; transition:transform .15s, border-color .15s; }
+.img-thumb.dragging { opacity:0.4; cursor:grabbing; }
+.img-thumb.drop-target { border-color:#111; transform:scale(0.97); }
+.img-thumb .thumb-img { width:100%; aspect-ratio:1; background-size:cover; background-position:center; background-color:#f0f0f0; }
+.img-thumb .thumb-bar { display:flex; align-items:center; justify-content:space-between; padding:4px 8px; font-size:11px; color:#666; }
+.img-thumb .rm { background:none; border:0; color:#c62828; font-size:16px; cursor:pointer; padding:0 4px; line-height:1; }
+.img-thumb .rm:hover { color:#000; }
+textarea { padding:10px 12px; font-size:14px; border:1px solid #ccc; border-radius:4px; font-family:inherit; resize:vertical; min-height:80px; }
 .preview-link { font-size:12px; color:#666; margin-top:8px; }
 .preview-link a { color:#111; }
 </style></head><body>
@@ -140,24 +150,38 @@ button:hover { background:#333; }
 <form method="post" action="{{ url_for('add_design') }}" enctype="multipart/form-data" id="design-form">
   <div class="section-title">① 卡片內容（必填）</div>
   <label>分類 tag
-    <input type="text" name="tag" list="design-tags" required placeholder="例：品牌識別 / 主視覺 / 周邊 / 平面圖文 / 影片">
+    <input type="text" name="tag" id="tag-field" list="design-tags" required placeholder="例：品牌識別 / 主視覺 / 周邊 / 平面圖文 / 影片">
     <datalist id="design-tags">{% for f in design.filters %}<option value="{{ f }}">{% endfor %}</datalist>
   </label>
   <label>標題 title
-    <input type="text" name="title" required placeholder="作品名稱（顯示在 hover 上）">
-  </label>
-  <label>說明 meta
-    <input type="text" name="meta" placeholder="客戶 / 年份 / 一句話">
+    <input type="text" name="title" required placeholder="作品名稱（顯示在卡片 hover 上）">
   </label>
 
   <div class="section-title" style="margin-top:18px;">② 縮圖與案例頁（選填）</div>
-  <div class="hint" style="margin:-6px 0 6px;">想讓卡片有縮圖、能點進詳細頁的話，<b>必須同時</b>填 slug + 上傳圖片。兩個都不填則只是純文字卡片（像現在大多數）。</div>
+  <div class="hint" style="margin:-6px 0 6px;">想讓卡片有縮圖、能點進詳細頁的話，<b>必須同時</b>填 slug + 上傳圖片。兩個都不填則只是純文字卡片。</div>
   <label>slug（網址用，英數小寫和 -，例如 yuntech-xd → /design/yuntech-xd/）
     <input type="text" name="slug" id="slug-field" placeholder="留空 = 不建立案例頁、無縮圖">
   </label>
-  <label>圖片（第一張會自動變成封面縮圖）
+  <label>圖片（第一張 = 封面；可拖曳預覽縮圖調整順序）
     <input type="file" name="images" id="img-field" multiple accept="image/*">
-    <span class="hint">需搭配 slug。自動轉 webp、壓到最大寬 2000px，存到 /design/&lt;slug&gt;/img/</span>
+    <span class="hint">自動轉 webp、壓到最大寬 2000px，存到 /design/&lt;slug&gt;/img/</span>
+  </label>
+  <div id="img-preview" class="img-preview"></div>
+
+  <div class="section-title" style="margin-top:18px;">③ 案例頁資訊（選填，沒填的欄位內頁不會顯示）</div>
+  <label>Client（客戶）
+    <input type="text" name="client" placeholder="例：詠豐電子材料">
+  </label>
+  <label>Year（年份）
+    <input type="text" name="year" placeholder="2026" value="2026">
+  </label>
+  <label>Credits（協作成員，用「，」或「／」分隔）
+    <input type="text" name="credits" placeholder="例：林晉維 / 陳○○（攝影）">
+  </label>
+
+  <div class="section-title" style="margin-top:18px;">④ About（敘述，選填）</div>
+  <label>
+    <textarea name="about" rows="5" placeholder="這個案子的故事 — 客戶背景、設計脈絡、視覺重點、成果。&#10;&#10;空一行 = 新段落。"></textarea>
   </label>
 
   <div class="row radio-row">
@@ -168,16 +192,81 @@ button:hover { background:#333; }
   <button type="submit">新增</button>
 </form>
 <script>
-document.getElementById('design-form').addEventListener('submit', function(e) {
-  var slug = document.getElementById('slug-field').value.trim();
-  var files = document.getElementById('img-field').files;
-  if (files.length > 0 && !slug) {
-    e.preventDefault();
-    alert('你上傳了圖片但沒填 slug。\n\n請填 slug（英數小寫，例：yongfeng），否則圖片無法儲存。');
-    document.getElementById('slug-field').focus();
-    return false;
+(() => {
+  const imgInput = document.getElementById('img-field');
+  const preview = document.getElementById('img-preview');
+  const slugEl = document.getElementById('slug-field');
+  const form = document.getElementById('design-form');
+  let files = [];
+
+  function render() {
+    preview.innerHTML = '';
+    files.forEach((f, i) => {
+      const url = URL.createObjectURL(f);
+      const div = document.createElement('div');
+      div.className = 'img-thumb';
+      div.draggable = true;
+      div.dataset.idx = i;
+      div.innerHTML = `
+        <div class="thumb-img" style="background-image:url('${url}')"></div>
+        <div class="thumb-bar">
+          <span class="order">${i + 1}${i === 0 ? ' · 封面' : ''}</span>
+          <button type="button" class="rm" data-rm="${i}" title="移除">×</button>
+        </div>`;
+      preview.appendChild(div);
+    });
+    preview.querySelectorAll('.rm').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        files.splice(+btn.dataset.rm, 1);
+        render();
+      });
+    });
+    preview.querySelectorAll('.img-thumb').forEach(el => {
+      el.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', el.dataset.idx);
+        el.classList.add('dragging');
+      });
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+      el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drop-target'); });
+      el.addEventListener('dragleave', () => el.classList.remove('drop-target'));
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        el.classList.remove('drop-target');
+        const from = +e.dataTransfer.getData('text/plain');
+        const to = +el.dataset.idx;
+        if (from === to) return;
+        const item = files.splice(from, 1)[0];
+        files.splice(to, 0, item);
+        render();
+      });
+    });
   }
-});
+
+  imgInput.addEventListener('change', e => {
+    for (const f of e.target.files) files.push(f);
+    e.target.value = '';
+    render();
+  });
+
+  form.addEventListener('submit', e => {
+    const slug = slugEl.value.trim();
+    if (files.length > 0 && !slug) {
+      e.preventDefault();
+      alert('你上傳了圖片但沒填 slug。\n\n請填 slug（英數小寫，例：yongfeng），否則圖片無法儲存。');
+      slugEl.focus();
+      return;
+    }
+    if (files.length === 0) return; // let normal form submit
+    e.preventDefault();
+    const fd = new FormData(form);
+    fd.delete('images');
+    files.forEach(f => fd.append('images', f, f.name));
+    fetch(form.action, { method: 'POST', body: fd, redirect: 'follow' })
+      .then(r => { window.location = r.url || '/?cat=design'; })
+      .catch(err => alert('送出失敗：' + err));
+  });
+})();
 </script>
 {% elif cat == 'film-video' %}
 <form method="post" action="{{ url_for('add_film_video') }}">
@@ -479,16 +568,19 @@ def delete_item():
 def add_design():
     tag = request.form["tag"].strip()
     title = request.form["title"].strip()
-    meta = request.form.get("meta", "").strip()
     slug_raw = request.form.get("slug", "").strip()
+    client = request.form.get("client", "").strip()
+    year = request.form.get("year", "").strip()
+    credits = request.form.get("credits", "").strip()
+    about = request.form.get("about", "").strip()
     position = request.form.get("position", "top")
     slug = slugify(slug_raw) if slug_raw else ""
 
     files = [f for f in request.files.getlist("images") if f and f.filename]
     cover = None
+    image_names: list[str] = []
     if slug and files:
         img_dir = DESIGN_DIR / slug / "img"
-        image_names: list[str] = []
         for i, fs in enumerate(files, 1):
             ext = ".webp" if HAS_PIL else Path(fs.filename).suffix.lower() or ".jpg"
             name = f"{slug}-{i:02d}{ext}"
@@ -496,27 +588,51 @@ def add_design():
             image_names.append(name)
             if i == 1:
                 cover = f"/design/{slug}/img/{name}"
-        case_html = DESIGN_DIR / slug / "index.html"
-        if not case_html.exists():
-            case_html.write_text(
-                stub_case_page(title, meta, slug, image_names), encoding="utf-8"
-            )
 
-    entry = {"tag": tag, "title": title}
-    if meta:
-        entry["meta"] = meta
+    entry: dict = {"tag": tag, "title": title}
     if slug:
         entry["href"] = f"/design/{slug}/"
     if cover:
         entry["cover"] = cover
+    if client:
+        entry["client"] = client
+    if year:
+        entry["year"] = year
+    if credits:
+        entry["credits"] = credits
+    if about:
+        entry["about"] = about
 
     data = load("design.json")
     ensure_filter(data, tag)
     insert(data["items"], entry, position)
     save("design.json", data)
+
+    # Generate / refresh case page when slug present (auto-stub only — won't overwrite hand-crafted)
+    if slug:
+        case_html = DESIGN_DIR / slug / "index.html"
+        existing = case_html.read_text(encoding="utf-8") if case_html.exists() else ""
+        if not existing or "weiimg-auto-stub" in existing:
+            case_html.parent.mkdir(parents=True, exist_ok=True)
+            case_html.write_text(
+                stub_case_page(
+                    title, slug, image_names or _existing_images(slug),
+                    client=client, year=year, type_=tag, credits=credits, about=about,
+                ),
+                encoding="utf-8",
+            )
+
     rebuild()
-    flash(f"已新增 design 作品：{title}" + (f"（{len(files)} 張圖已存至 /design/{slug}/img/）" if files and slug else ""))
+    note = f"（{len(files)} 張圖已存至 /design/{slug}/img/）" if files and slug else ""
+    flash(f"已新增 design 作品：{title}{note}")
     return redirect(url_for("index", cat="design"))
+
+
+def _existing_images(slug: str) -> list[str]:
+    d = DESIGN_DIR / slug / "img"
+    if not d.exists():
+        return []
+    return sorted([p.name for p in d.iterdir() if p.is_file()])
 
 
 @app.post("/add/film-video")
@@ -678,16 +794,18 @@ CASE_STYLE = """<style>
   .xd-carousel { position: relative; margin: 32px 0 48px; background: var(--dark-2); overflow: hidden; aspect-ratio: 16 / 9; user-select: none; }
   .xd-carousel-track { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
   .xd-carousel-track.dragging { transition: none; }
-  .xd-carousel-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--dark-2); }
+  .xd-carousel-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--dark-2); cursor: zoom-in; }
   .xd-carousel-slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; pointer-events: none; }
-  .xd-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border: 1px solid var(--border); background: rgba(255,255,255,0.85); color: var(--dark); font-size: 18px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-  .xd-carousel-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .xd-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; background: transparent; color: rgba(255,255,255,0.85); font-family: system-ui, sans-serif; font-size: 32px; font-weight: 300; line-height: 1; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; padding: 0; text-shadow: 0 1px 6px rgba(0,0,0,0.4); transition: color 0.2s, transform 0.2s; }
+  .xd-carousel-btn:hover { color: #fff; }
   .xd-carousel-btn.prev { left: 16px; }
   .xd-carousel-btn.next { right: 16px; }
-  .xd-carousel-counter { position: absolute; bottom: 16px; right: 24px; font-size: 11px; letter-spacing: 0.15em; color: var(--dark); background: rgba(255,255,255,0.85); padding: 6px 12px; z-index: 5; }
+  .xd-carousel-btn.prev:hover { transform: translateY(-50%) translateX(-3px); }
+  .xd-carousel-btn.next:hover { transform: translateY(-50%) translateX(3px); }
+  .xd-carousel-counter { position: absolute; bottom: 16px; right: 24px; font-size: 11px; letter-spacing: 0.15em; color: rgba(255,255,255,0.75); background: transparent; padding: 0; z-index: 5; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
   .xd-carousel-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 5; }
-  .xd-carousel-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(45,45,45,0.3); cursor: pointer; transition: background 0.2s; }
-  .xd-carousel-dots span.on { background: var(--dark); }
+  .xd-carousel-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: background 0.2s; }
+  .xd-carousel-dots span.on { background: #fff; }
   .xd-thumbs { display: flex; gap: 8px; margin: 0 0 48px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; }
   .xd-thumbs::-webkit-scrollbar { height: 6px; }
   .xd-thumbs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -696,6 +814,21 @@ CASE_STYLE = """<style>
   .xd-thumb:hover { opacity: 1; }
   .xd-thumb.on { border-color: var(--accent); opacity: 1; }
   .xd-section-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin: 0 0 16px; }
+  /* Lightbox */
+  .xd-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; z-index: 1000; cursor: zoom-out; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .xd-lightbox.open { opacity: 1; pointer-events: auto; }
+  .xd-lightbox .xd-lightbox-img-wrap { max-width: 92vw; max-height: 88vh; display: flex; align-items: center; justify-content: center; transform: scale(0.94); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1); }
+  .xd-lightbox.open .xd-lightbox-img-wrap { transform: scale(1); }
+  .xd-lightbox img { max-width: 92vw; max-height: 88vh; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.5); user-select: none; -webkit-user-drag: none; }
+  .xd-lightbox-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; border: 0; background: transparent; color: rgba(255,255,255,0.9); font-family: system-ui, sans-serif; font-size: 44px; font-weight: 300; line-height: 1; cursor: pointer; z-index: 1001; padding: 0; transition: color 0.2s, transform 0.2s; text-shadow: 0 2px 12px rgba(0,0,0,0.5); }
+  .xd-lightbox-btn:hover { color: #fff; }
+  .xd-lightbox-btn.prev { left: 24px; }
+  .xd-lightbox-btn.next { right: 24px; }
+  .xd-lightbox-btn.prev:hover { transform: translateY(-50%) translateX(-4px); }
+  .xd-lightbox-btn.next:hover { transform: translateY(-50%) translateX(4px); }
+  .xd-lightbox-counter { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.85); font-size: 12px; letter-spacing: 0.2em; z-index: 1001; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+  .xd-lightbox-close { position: fixed; top: 24px; right: 32px; font-size: 32px; background: none; border: 0; color: rgba(255,255,255,0.9); cursor: pointer; line-height: 1; padding: 4px 8px; z-index: 1001; transition: color 0.2s; }
+  .xd-lightbox-close:hover { color: #fff; }
 </style>"""
 
 CASE_CAROUSEL_SCRIPT = """<script>
@@ -708,6 +841,12 @@ CASE_CAROUSEL_SCRIPT = """<script>
   const next = root.querySelector('.next');
   const cur = root.querySelector('.cur');
   const dotsWrap = root.querySelector('.xd-carousel-dots');
+  const lightbox = document.getElementById('xdLightbox');
+  const lightboxImg = lightbox ? lightbox.querySelector('img') : null;
+  const lightboxCurEl = lightbox ? lightbox.querySelector('.cur') : null;
+  const lightboxPrev = lightbox ? lightbox.querySelector('.xd-lightbox-btn.prev') : null;
+  const lightboxNext = lightbox ? lightbox.querySelector('.xd-lightbox-btn.next') : null;
+  const lightboxClose = lightbox ? lightbox.querySelector('.xd-lightbox-close') : null;
   let idx = 0;
   const total = slides.length;
   for (let i = 0; i < total; i++) {
@@ -727,20 +866,26 @@ CASE_CAROUSEL_SCRIPT = """<script>
     thumbs.forEach((t, i) => t.classList.toggle('on', i === idx));
     const active = thumbs[idx];
     if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (lightbox && lightbox.classList.contains('open')) {
+      const img = slides[idx].querySelector('img');
+      if (img && lightboxImg) lightboxImg.src = img.src;
+      if (lightboxCurEl) lightboxCurEl.textContent = idx + 1;
+    }
   }
-  prev.addEventListener('click', () => go(idx - 1));
-  next.addEventListener('click', () => go(idx + 1));
+  prev.addEventListener('click', e => { e.stopPropagation(); go(idx - 1); });
+  next.addEventListener('click', e => { e.stopPropagation(); go(idx + 1); });
   root.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') go(idx - 1);
     if (e.key === 'ArrowRight') go(idx + 1);
   });
   root.tabIndex = 0;
-  let startX = 0, dx = 0, dragging = false;
-  const onDown = e => { dragging = true; startX = (e.touches ? e.touches[0].clientX : e.clientX); track.classList.add('dragging'); };
+  let startX = 0, dx = 0, dragging = false, moved = false;
+  const onDown = e => { dragging = true; moved = false; startX = (e.touches ? e.touches[0].clientX : e.clientX); track.classList.add('dragging'); };
   const onMove = e => {
     if (!dragging) return;
     const x = (e.touches ? e.touches[0].clientX : e.clientX);
     dx = x - startX;
+    if (Math.abs(dx) > 5) moved = true;
     track.style.transform = `translateX(calc(-${idx * 100}% + ${dx}px))`;
   };
   const onUp = () => {
@@ -758,6 +903,34 @@ CASE_CAROUSEL_SCRIPT = """<script>
   root.addEventListener('touchstart', onDown, { passive: true });
   root.addEventListener('touchmove', onMove, { passive: true });
   root.addEventListener('touchend', onUp);
+  // Click to open lightbox (only if not dragging)
+  slides.forEach((slide, i) => {
+    slide.addEventListener('click', e => {
+      if (moved) { moved = false; return; }
+      if (!lightbox || !lightboxImg) return;
+      const img = slide.querySelector('img');
+      if (!img) return;
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt || '';
+      lightbox.classList.add('open');
+    });
+  });
+  if (lightbox) {
+    const close = () => lightbox.classList.remove('open');
+    lightbox.addEventListener('click', e => {
+      // Close only when clicking the empty area (not buttons/img/counter)
+      if (e.target === lightbox) close();
+    });
+    if (lightboxClose) lightboxClose.addEventListener('click', e => { e.stopPropagation(); close(); });
+    if (lightboxPrev) lightboxPrev.addEventListener('click', e => { e.stopPropagation(); go(idx - 1); });
+    if (lightboxNext) lightboxNext.addEventListener('click', e => { e.stopPropagation(); go(idx + 1); });
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') go(idx - 1);
+      else if (e.key === 'ArrowRight') go(idx + 1);
+    });
+  }
 })();
 </script>"""
 
@@ -789,15 +962,40 @@ def _build_sidebar_links(current_slug: str) -> str:
     return "\n".join(rows)
 
 
+def _render_about(text: str) -> str:
+    if not text or not text.strip():
+        return "<!-- ABOUT 區塊尚未填寫 -->"
+    paragraphs = [p.strip() for p in text.replace("\r\n", "\n").split("\n\n") if p.strip()]
+    return "\n          ".join(
+        f"<p>{escape(p).replace(chr(10), '<br>')}</p>" for p in paragraphs
+    )
+
+
+def _meta_row(label: str, value: str) -> str:
+    if not value:
+        return ""
+    return (
+        '          <div class="meta-row">\n'
+        f'            <div class="meta-label">{label}</div>\n'
+        f'            <div class="meta-value">{escape(value)}</div>\n'
+        "          </div>"
+    )
+
+
 def stub_case_page(
     title: str,
-    meta: str,
     slug: str,
     image_files: list[str] | None = None,
+    *,
+    client: str = "",
+    year: str = "",
+    type_: str = "",
+    credits: str = "",
+    about: str = "",
 ) -> str:
     images = image_files or []
     slides = "\n          ".join(
-        f'<div class="xd-carousel-slide"><img src="img/{fn}" alt="{title} — {i+1}"{" loading=\"lazy\"" if i else ""}></div>'
+        f'<div class="xd-carousel-slide"><img src="img/{fn}" alt="{escape(title)} — {i+1}"{" loading=\"lazy\"" if i else ""}></div>'
         for i, fn in enumerate(images)
     ) or '<div class="xd-carousel-slide"><!-- 尚未上傳圖片 --></div>'
     thumbs = "\n        ".join(
@@ -806,17 +1004,31 @@ def stub_case_page(
     )
     sidebar = _build_sidebar_links(slug) or '      <a href="#" class="current">本作品</a>'
     total = max(1, len(images))
+    meta_rows = "\n".join(
+        r for r in [
+            _meta_row("CLIENT", client),
+            _meta_row("YEAR", year),
+            _meta_row("TYPE", type_),
+            _meta_row("CREDITS", credits),
+        ] if r
+    )
+    about_html = _render_about(about)
     return f"""<!DOCTYPE html>
 <!-- weiimg-auto-stub -->
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{title} — WEIIMG 設計案例。">
-<title>{title} — WEIIMG</title>
+<meta name="description" content="{escape(title)} — WEIIMG 設計案例。">
+<title>{escape(title)} — WEIIMG</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Inter:wght@100;300;400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>html{{background:#0a0a0a}}body{{opacity:0;transition:opacity .15s ease-out}}body.ready{{opacity:1}}</style>
 <link rel="stylesheet" href="../../style.css?v=5">
+<script>addEventListener("load",()=>document.body.classList.add("ready"))</script>
 {CASE_STYLE}
 </head>
 <body class="inner-page">
@@ -826,7 +1038,6 @@ def stub_case_page(
 <main>
   <div class="article-layout">
     <aside class="article-sidebar">
-      <h4>設計</h4>
 {sidebar}
     </aside>
     <div class="article-main">
@@ -837,8 +1048,8 @@ def stub_case_page(
         <div class="xd-carousel-track">
           {slides}
         </div>
-        <button class="xd-carousel-btn prev" aria-label="上一張">&larr;</button>
-        <button class="xd-carousel-btn next" aria-label="下一張">&rarr;</button>
+        <button class="xd-carousel-btn prev" aria-label="上一張">&lsaquo;</button>
+        <button class="xd-carousel-btn next" aria-label="下一張">&rsaquo;</button>
         <div class="xd-carousel-counter"><span class="cur">1</span> / <span class="total">{total}</span></div>
         <div class="xd-carousel-dots"></div>
       </div>
@@ -849,19 +1060,11 @@ def stub_case_page(
 
       <div class="article-body-grid">
         <div class="article-meta-col">
-          <h1>{title}</h1>
-          <div class="meta-row">
-            <div class="meta-label">說明</div>
-            <div class="meta-value">{meta or "—"}</div>
-          </div>
-          <!-- TODO: 補上更多 meta-row（類型 / 主辦 / 年份 / 服務項目 等） -->
+          <h1>{escape(title)}</h1>
+{meta_rows}
         </div>
         <div class="article-text-col">
-          <div class="xd-section-title">概念 / Concept</div>
-          <p><!-- TODO: 概念敘述 --></p>
-
-          <div class="xd-section-title" style="margin-top:48px;">主視覺 / Key Visual</div>
-          <p><!-- TODO: 視覺說明 --></p>
+          {about_html}
         </div>
       </div>
 
@@ -870,6 +1073,14 @@ def stub_case_page(
 </main>
 
 {CASE_FOOTER}
+
+<div class="xd-lightbox" id="xdLightbox" aria-hidden="true">
+  <button class="xd-lightbox-btn prev" aria-label="上一張">&lsaquo;</button>
+  <div class="xd-lightbox-img-wrap"><img src="" alt=""></div>
+  <button class="xd-lightbox-btn next" aria-label="下一張">&rsaquo;</button>
+  <div class="xd-lightbox-counter"><span class="cur">1</span> / <span class="total">{total}</span></div>
+  <button class="xd-lightbox-close" aria-label="關閉">&times;</button>
+</div>
 
 {CASE_CAROUSEL_SCRIPT}
 {CASE_SCRIPT}
