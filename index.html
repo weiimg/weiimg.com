@@ -13,24 +13,24 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
 <title>WEIIMG</title>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
 <nav class="nav">
-  <a href="index.html" class="nav-logo">WEIIMG<span class="reg">*</span><span class="arrow-line"></span></a>
+  <a href="/" class="nav-logo">WEIIMG<span class="reg">*</span><span class="arrow-line"></span></a>
   <div class="nav-items">
     <div class="nav-slide-wrap">
       <div class="nav-slide-inner">
         <div class="nav-row">
           <span class="has-dropdown">WORK</span>
-          <a href="about/index.html">ABOUT</a>
-          <a href="blog/index.html">BLOG</a>
+          <a href="/about/">ABOUT</a>
+          <a href="/blog/">BLOG</a>
         </div>
         <div class="nav-row">
-          <a href="design/index.html">DESIGN</a>
-          <a href="film/index.html">FILM</a>
-          <a href="shortform/index.html">SHORTS</a>
+          <a href="/design/">DESIGN</a>
+          <a href="/film/">FILM</a>
+          <a href="/shortform/">SHORTS</a>
         </div>
       </div>
     </div>
@@ -72,6 +72,11 @@
     <video class="parallax-video" src="assets/showreel.mp4" autoplay loop muted playsinline></video>
   </div>
 
+  <!-- 影片進度條（顯示用，無互動） -->
+  <div class="showreel-progress" aria-hidden="true">
+    <div class="showreel-progress-fill"></div>
+  </div>
+
   <!-- 服務列表 -->
   <div class="services-section">
     <div class="services-nav">
@@ -103,7 +108,7 @@
           <li>視覺設計 / Logo 規劃</li>
           <li>社群內容策劃</li>
         </ul>
-        <a href="design/index.html" class="svc-panel-link">探索作品 &rarr;</a>
+        <a href="/design/" class="svc-panel-link">探索作品 &rarr;</a>
       </div>
       <div class="svc-panel" id="svc-2">
         <div class="svc-panel-en">CREATIVE CONTENT</div>
@@ -114,7 +119,7 @@
           <li>社群圖文製作</li>
           <li>內容策略規劃</li>
         </ul>
-        <a href="shortform/index.html" class="svc-panel-link">探索作品 &rarr;</a>
+        <a href="/shortform/" class="svc-panel-link">探索作品 &rarr;</a>
       </div>
       <div class="svc-panel" id="svc-3">
         <div class="svc-panel-en">FILM &amp; MOTION</div>
@@ -125,7 +130,7 @@
           <li>廣告腳本企劃</li>
           <li>後製調色</li>
         </ul>
-        <a href="film/index.html" class="svc-panel-link">探索作品 &rarr;</a>
+        <a href="/film/" class="svc-panel-link">探索作品 &rarr;</a>
       </div>
     </div>
   </div>
@@ -246,6 +251,20 @@ if (logo && line && navItems) {
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   });
+})();
+
+/* Showreel progress bar (display-only, smooth via RAF) */
+(() => {
+  const video = document.querySelector('.parallax-video');
+  const fill = document.querySelector('.showreel-progress-fill');
+  if (!video || !fill) return;
+  function tick() {
+    if (video.duration) {
+      fill.style.width = (video.currentTime / video.duration * 100) + '%';
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 })();
 
 /* Video overlay dissolve */
