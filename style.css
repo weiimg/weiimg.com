@@ -150,13 +150,25 @@ body.inner-page,
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', -apple-system, "Helvetica Neue", sans-serif;
-  letter-spacing: -0.05cap;
+  font-family: 'Inter', 'Noto Sans TC', -apple-system, "Helvetica Neue", sans-serif;
+  font-synthesis: none;
   background: #f0f0f0;
   color: var(--dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Tighten tracking on large display headings */
+.hero-brand,
+.svc-nav-title,
+.svc-panel-title,
+.about-intro h1,
+.awards-section h2,
+.blog-list h1,
+.blog-article-header h1,
+.contact-email {
+  letter-spacing: -0.05cap;
 }
 
 /* ===== Grain overlay ===== */
@@ -484,6 +496,23 @@ body.inner-page main {
   opacity: var(--overlay-opacity);
   pointer-events: none;
   z-index: 2;
+}
+
+/* Showreel video progress bar (display-only) */
+.showreel-progress {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 3;
+  pointer-events: none;
+}
+.showreel-progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  will-change: width;
 }
 
 /* ===== Services (P1) ===== */
@@ -965,6 +994,7 @@ body.inner-page main {
   line-height: 1;
 }
 .about-intro p { font-size: 15px; line-height: 1.85; color: var(--gray-light); }
+.about-intro p + p { margin-top: 6px; }
 .awards-section {
   padding: 64px 48px;
   border-top: 1px solid var(--border);
@@ -983,7 +1013,7 @@ body.inner-page main {
   transition: background 0.2s;
 }
 .award-row:hover { background: var(--dark-2); }
-.award-year { color: var(--gray); font-family: monospace; }
+.award-year { color: var(--gray); font-family: 'Inter', 'Noto Sans TC', sans-serif; font-feature-settings: 'tnum' 1; letter-spacing: 0.05em; }
 .award-rank { color: var(--accent); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-align: right; }
 
 /* ===== Blog List (P7) ===== */
@@ -1108,10 +1138,6 @@ body.inner-page main {
 @media (max-width: 1264px) {
   .blog-toc { display: none; }
 }
-.blog-article-body,
-.blog-article-header h1 {
-  font-family: 'Noto Sans TC', 'Inter', -apple-system, 'Helvetica Neue', sans-serif;
-}
 .blog-article-body p,
 .blog-article-body ul,
 .blog-article-body ol {
@@ -1150,14 +1176,14 @@ body.inner-page main {
   margin: 24px auto;
   border-radius: 4px;
 }
-.blog-article-body .photo-zoom {
+.photo-zoom {
   display: block;
   position: relative;
   overflow: hidden;
-  margin: 24px auto;
   border-radius: 4px;
 }
-.blog-article-body .photo-zoom img {
+.blog-article-body .photo-zoom { margin: 24px auto; }
+.photo-zoom img {
   display: block;
   width: 100%;
   margin: 0;
@@ -1166,9 +1192,51 @@ body.inner-page main {
   transition: transform 0.15s ease-out;
   will-change: transform;
 }
-.blog-article-body .photo-zoom.leaving img {
+.photo-zoom.leaving img {
   transition: transform 0.5s cubic-bezier(.4,0,.2,1);
 }
+
+/* About-page easter egg */
+.about-photo img.shake {
+  animation: aboutShake 0.5s ease-in-out;
+}
+@keyframes aboutShake {
+  0%, 100% { transform: translate(0) rotate(0); }
+  15%  { transform: translate(-8px, 0) rotate(-2.5deg); }
+  30%  { transform: translate(8px, 0)  rotate(2.5deg); }
+  45%  { transform: translate(-6px, 0) rotate(-1.8deg); }
+  60%  { transform: translate(6px, 0)  rotate(1.8deg); }
+  80%  { transform: translate(-3px, 0) rotate(-0.6deg); }
+}
+.falling-photo {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  will-change: transform;
+  border-radius: 4px;
+}
+.about-photo.has-cat {
+  background: transparent;
+  border: 0;
+}
+.about-photo.has-cat .photo-zoom { width: 60%; }
+.easter-cat {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  animation: catWiggle 0.1s linear infinite;
+  will-change: transform;
+}
+@keyframes catWiggle {
+  0%   { transform: translate(-2px, -1px) rotate(-1.2deg); }
+  20%  { transform: translate(2px,  1px) rotate(1.2deg);  }
+  40%  { transform: translate(-2px, 2px) rotate(-0.8deg); }
+  60%  { transform: translate(2px, -2px) rotate(1deg);   }
+  80%  { transform: translate(-1px, 1px) rotate(-0.6deg); }
+  100% { transform: translate(-2px, -1px) rotate(-1.2deg); }
+}
+.about-photo .photo-zoom.has-cat { overflow: visible; }
 .blog-article-body a { color: var(--blog-link); text-decoration: underline; text-underline-offset: 3px; transition: color 0.4s ease; }
 .blog-article-body b, .blog-article-body strong { color: var(--blog-strong); font-weight: 700; }
 
