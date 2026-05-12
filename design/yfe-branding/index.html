@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!-- weiimg-auto-stub -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="詠豐電子 品牌識別優化 — WEIIMG 設計案例。">
+<title>詠豐電子 品牌識別優化 — WEIIMG</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="stylesheet" href="../../style.css?v=5">
+<style>
+  .xd-carousel { position: relative; margin: 32px 0 48px; background: var(--dark-2); overflow: hidden; aspect-ratio: 16 / 9; user-select: none; }
+  .xd-carousel-track { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+  .xd-carousel-track.dragging { transition: none; }
+  .xd-carousel-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--dark-2); }
+  .xd-carousel-slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; pointer-events: none; }
+  .xd-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border: 1px solid var(--border); background: rgba(255,255,255,0.85); color: var(--dark); font-size: 18px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .xd-carousel-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .xd-carousel-btn.prev { left: 16px; }
+  .xd-carousel-btn.next { right: 16px; }
+  .xd-carousel-counter { position: absolute; bottom: 16px; right: 24px; font-size: 11px; letter-spacing: 0.15em; color: var(--dark); background: rgba(255,255,255,0.85); padding: 6px 12px; z-index: 5; }
+  .xd-carousel-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 5; }
+  .xd-carousel-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(45,45,45,0.3); cursor: pointer; transition: background 0.2s; }
+  .xd-carousel-dots span.on { background: var(--dark); }
+  .xd-thumbs { display: flex; gap: 8px; margin: 0 0 48px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; }
+  .xd-thumbs::-webkit-scrollbar { height: 6px; }
+  .xd-thumbs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .xd-thumb { flex: 0 0 88px; height: 60px; background: var(--dark-2); cursor: pointer; overflow: hidden; border: 2px solid transparent; transition: border-color 0.2s, opacity 0.2s; opacity: 0.6; }
+  .xd-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .xd-thumb:hover { opacity: 1; }
+  .xd-thumb.on { border-color: var(--accent); opacity: 1; }
+  .xd-section-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin: 0 0 16px; }
+</style>
+</head>
+<body class="inner-page">
+
+<nav class="nav">
+  <a href="/" class="nav-logo">WEIIMG<span class="reg">*</span><span class="arrow-line"></span></a>
+  <div class="nav-items">
+    <div class="nav-slide-wrap">
+      <div class="nav-slide-inner">
+        <div class="nav-row">
+          <span class="has-dropdown">WORK</span>
+          <a href="/about/">ABOUT</a>
+          <a href="/blog/">BLOG</a>
+        </div>
+        <div class="nav-row">
+          <a href="/design/">DESIGN</a>
+          <a href="/film/">FILM</a>
+          <a href="/shortform/">SHORTS</a>
+        </div>
+      </div>
+    </div>
+    <div class="nav-cta-wrap">
+      <span class="nav-cta">FIND ME</span>
+      <div class="findme-dropdown">
+        <a href="mailto:hi@weiimg.com"><span class="fm-icon">✉</span>hi@weiimg.com</a>
+        <a href="https://instagram.com/wei_img" target="_blank" rel="noopener noreferrer"><span class="fm-icon">📷</span>Instagram</a>
+        <a href="https://threads.net/@wei_img" target="_blank" rel="noopener noreferrer"><span class="fm-icon">🧵</span>Threads</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="article-layout">
+    <aside class="article-sidebar">
+      <h4>設計</h4>
+      <a href="/design/liffestore-rebranding/">樂飛潮玩 品牌識別優化</a>
+      <a href="#" class="current">詠豐電子 品牌識別優化</a>
+      <a href="/design/yuntech-xd/">(XD)</a>
+    </aside>
+    <div class="article-main">
+
+      <div class="article-back"><a href="/design/">&larr; 返回設計</a></div>
+
+      <div class="xd-carousel" id="xdCarousel">
+        <div class="xd-carousel-track">
+          <div class="xd-carousel-slide"><img src="img/yfe-branding-01.webp" alt="詠豐電子 品牌識別優化 — 1"></div>
+          <div class="xd-carousel-slide"><img src="img/yfe-branding-02.webp" alt="詠豐電子 品牌識別優化 — 2" loading="lazy"></div>
+          <div class="xd-carousel-slide"><img src="img/yfe-branding-03.webp" alt="詠豐電子 品牌識別優化 — 3" loading="lazy"></div>
+        </div>
+        <button class="xd-carousel-btn prev" aria-label="上一張">&larr;</button>
+        <button class="xd-carousel-btn next" aria-label="下一張">&rarr;</button>
+        <div class="xd-carousel-counter"><span class="cur">1</span> / <span class="total">3</span></div>
+        <div class="xd-carousel-dots"></div>
+      </div>
+
+      <div class="xd-thumbs" id="xdThumbs">
+        <div class="xd-thumb on"><img src="img/yfe-branding-01.webp" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/yfe-branding-02.webp" alt="" loading="lazy"></div>
+        <div class="xd-thumb"><img src="img/yfe-branding-03.webp" alt="" loading="lazy"></div>
+      </div>
+
+      <div class="article-body-grid">
+        <div class="article-meta-col">
+          <h1>詠豐電子 品牌識別優化</h1>
+          <div class="meta-row">
+            <div class="meta-label">說明</div>
+            <div class="meta-value">2025</div>
+          </div>
+          <!-- TODO: 補上更多 meta-row（類型 / 主辦 / 年份 / 服務項目 等） -->
+        </div>
+        <div class="article-text-col">
+          <div class="xd-section-title">概念 / Concept</div>
+          <p><!-- TODO: 概念敘述 --></p>
+
+          <div class="xd-section-title" style="margin-top:48px;">主視覺 / Key Visual</div>
+          <p><!-- TODO: 視覺說明 --></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="contact">
+  <div class="contact-label">Let's collaborate!</div>
+  <div class="contact-email"><a href="mailto:hi@weiimg.com">hi@weiimg.com</a></div>
+  <a href="mailto:hi@weiimg.com" class="contact-cta">FIND ME</a>
+  <div class="contact-copyright">&copy; 2026 林晉維 — weiimg.com</div>
+</footer>
+
+<script>
+(() => {
+  const root = document.getElementById('xdCarousel');
+  if (!root) return;
+  const track = root.querySelector('.xd-carousel-track');
+  const slides = root.querySelectorAll('.xd-carousel-slide');
+  const prev = root.querySelector('.prev');
+  const next = root.querySelector('.next');
+  const cur = root.querySelector('.cur');
+  const dotsWrap = root.querySelector('.xd-carousel-dots');
+  let idx = 0;
+  const total = slides.length;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('span');
+    if (i === 0) d.classList.add('on');
+    d.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(d);
+  }
+  const dots = dotsWrap.querySelectorAll('span');
+  const thumbs = document.querySelectorAll('#xdThumbs .xd-thumb');
+  thumbs.forEach((t, i) => t.addEventListener('click', () => go(i)));
+  function go(n) {
+    idx = (n + total) % total;
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    if (cur) cur.textContent = idx + 1;
+    dots.forEach((d, i) => d.classList.toggle('on', i === idx));
+    thumbs.forEach((t, i) => t.classList.toggle('on', i === idx));
+    const active = thumbs[idx];
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+  prev.addEventListener('click', () => go(idx - 1));
+  next.addEventListener('click', () => go(idx + 1));
+  root.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') go(idx - 1);
+    if (e.key === 'ArrowRight') go(idx + 1);
+  });
+  root.tabIndex = 0;
+  let startX = 0, dx = 0, dragging = false;
+  const onDown = e => { dragging = true; startX = (e.touches ? e.touches[0].clientX : e.clientX); track.classList.add('dragging'); };
+  const onMove = e => {
+    if (!dragging) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    dx = x - startX;
+    track.style.transform = `translateX(calc(-${idx * 100}% + ${dx}px))`;
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove('dragging');
+    const w = root.offsetWidth;
+    if (Math.abs(dx) > w * 0.15) go(idx + (dx < 0 ? 1 : -1));
+    else go(idx);
+    dx = 0;
+  };
+  root.addEventListener('mousedown', onDown);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  root.addEventListener('touchstart', onDown, { passive: true });
+  root.addEventListener('touchmove', onMove, { passive: true });
+  root.addEventListener('touchend', onUp);
+})();
+</script>
+<script>
+(() => {
+  const wrap = document.querySelector('.nav-slide-wrap');
+  const trigger = wrap && wrap.querySelector('.has-dropdown');
+  if (!wrap || !trigger) return;
+  let timer;
+  const show = () => { clearTimeout(timer); wrap.classList.add('open'); };
+  const hide = () => { timer = setTimeout(() => wrap.classList.remove('open'), 250); };
+  trigger.addEventListener('mouseenter', show);
+  wrap.addEventListener('mouseleave', hide);
+  wrap.querySelectorAll('.nav-row:last-child a').forEach(a => a.addEventListener('mouseenter', show));
+})();
+const logo = document.querySelector('.nav-logo');
+const line = logo && logo.querySelector('.arrow-line');
+const navItems = document.querySelector('.nav-items');
+if (logo && line && navItems) {
+  function setArrowWidth() {
+    const lR = logo.getBoundingClientRect(), nR = navItems.getBoundingClientRect();
+    line.style.width = Math.max(0, nR.left - lR.right - 12) + 'px';
+  }
+  logo.addEventListener('mouseenter', () => { setArrowWidth(); logo.classList.remove('arrow-out'); logo.classList.add('arrow-in'); });
+  logo.addEventListener('mouseleave', () => { logo.classList.remove('arrow-in'); logo.classList.add('arrow-out'); line.addEventListener('transitionend', () => logo.classList.remove('arrow-out'), { once: true }); });
+}
+</script>
+<script src="/nav.js?v=3"></script>
+</body>
+</html>
