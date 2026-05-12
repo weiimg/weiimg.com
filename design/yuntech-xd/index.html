@@ -11,8 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Inter:wght@100;300;400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
 <style>html{background:#0a0a0a}body{opacity:0;transition:opacity .15s ease-out}body.ready{opacity:1}</style>
+
 <link rel="stylesheet" href="../../style.css?v=5">
-<script>addEventListener('load',()=>document.body.classList.add('ready'))</script>
+
+<script>addEventListener("load",()=>document.body.classList.add("ready"))</script>
 <style>
   .xd-carousel {
     position: relative;
@@ -37,6 +39,7 @@
     justify-content: center;
     background: var(--dark-2);
   }
+  .xd-carousel-slide { cursor: zoom-in; }
   .xd-carousel-slide img {
     max-width: 100%;
     max-height: 100%;
@@ -49,32 +52,40 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
-    border: 1px solid var(--border);
-    background: rgba(255,255,255,0.85);
-    color: var(--dark);
-    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,0.85);
+    font-family: system-ui, sans-serif;
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
     cursor: pointer;
     z-index: 5;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    padding: 0;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    transition: color 0.2s, transform 0.2s;
   }
-  .xd-carousel-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .xd-carousel-btn:hover { color: #fff; }
   .xd-carousel-btn.prev { left: 16px; }
   .xd-carousel-btn.next { right: 16px; }
+  .xd-carousel-btn.prev:hover { transform: translateY(-50%) translateX(-3px); }
+  .xd-carousel-btn.next:hover { transform: translateY(-50%) translateX(3px); }
   .xd-carousel-counter {
     position: absolute;
     bottom: 16px;
     right: 24px;
     font-size: 11px;
     letter-spacing: 0.15em;
-    color: var(--dark);
-    background: rgba(255,255,255,0.85);
-    padding: 6px 12px;
+    color: rgba(255,255,255,0.75);
+    background: transparent;
+    padding: 0;
     z-index: 5;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
   .xd-carousel-dots {
     position: absolute;
@@ -89,11 +100,11 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(45,45,45,0.3);
+    background: rgba(255,255,255,0.3);
     cursor: pointer;
     transition: background 0.2s;
   }
-  .xd-carousel-dots span.on { background: var(--dark); }
+  .xd-carousel-dots span.on { background: #fff; }
   .xd-thumbs {
     display: flex;
     gap: 8px;
@@ -124,6 +135,21 @@
     color: var(--gray);
     margin: 0 0 16px;
   }
+  /* Lightbox */
+  .xd-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; z-index: 1000; cursor: zoom-out; opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .xd-lightbox.open { opacity: 1; pointer-events: auto; }
+  .xd-lightbox .xd-lightbox-img-wrap { max-width: 92vw; max-height: 88vh; display: flex; align-items: center; justify-content: center; transform: scale(0.94); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1); }
+  .xd-lightbox.open .xd-lightbox-img-wrap { transform: scale(1); }
+  .xd-lightbox img { max-width: 92vw; max-height: 88vh; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.5); user-select: none; -webkit-user-drag: none; }
+  .xd-lightbox-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; border: 0; background: transparent; color: rgba(255,255,255,0.9); font-family: system-ui, sans-serif; font-size: 44px; font-weight: 300; line-height: 1; cursor: pointer; z-index: 1001; padding: 0; transition: color 0.2s, transform 0.2s; text-shadow: 0 2px 12px rgba(0,0,0,0.5); }
+  .xd-lightbox-btn:hover { color: #fff; }
+  .xd-lightbox-btn.prev { left: 24px; }
+  .xd-lightbox-btn.next { right: 24px; }
+  .xd-lightbox-btn.prev:hover { transform: translateY(-50%) translateX(-4px); }
+  .xd-lightbox-btn.next:hover { transform: translateY(-50%) translateX(4px); }
+  .xd-lightbox-counter { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.85); font-size: 12px; letter-spacing: 0.2em; z-index: 1001; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+  .xd-lightbox-close { position: fixed; top: 24px; right: 32px; font-size: 32px; background: none; border: 0; color: rgba(255,255,255,0.9); cursor: pointer; line-height: 1; padding: 4px 8px; z-index: 1001; transition: color 0.2s; }
+  .xd-lightbox-close:hover { color: #fff; }
 </style>
 </head>
 <body class="inner-page">
@@ -148,9 +174,9 @@
     <div class="nav-cta-wrap">
       <span class="nav-cta">FIND ME</span>
       <div class="findme-dropdown">
-        <a href="mailto:hi@weiimg.com"><span class="fm-icon">✉</span>hi@weiimg.com</a>
-        <a href="https://instagram.com/wei_img" target="_blank" rel="noopener noreferrer"><span class="fm-icon">📷</span>Instagram</a>
-        <a href="https://threads.net/@wei_img" target="_blank" rel="noopener noreferrer"><span class="fm-icon">🧵</span>Threads</a>
+        <a href="mailto:hi@weiimg.com">hi@weiimg.com</a>
+        <a href="https://instagram.com/wei_img" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://threads.net/@wei_img" target="_blank" rel="noopener noreferrer">Threads</a>
       </div>
     </div>
   </div>
@@ -159,7 +185,6 @@
 <main>
   <div class="article-layout">
     <aside class="article-sidebar">
-      <h4>設計</h4>
       <a href="/design/liffestore-rebranding/">樂飛潮玩 品牌識別優化</a>
       <a href="/design/yfe-branding/">詠豐電子 品牌識別優化</a>
       <a href="#" class="current">(XD) 雲科數媒114級畢業展</a>
@@ -181,8 +206,8 @@
           <div class="xd-carousel-slide"><img src="img/畢籌作品集_19.jpg" alt="(XD) 視覺 19" loading="lazy"></div>
           <div class="xd-carousel-slide"><img src="img/畢籌作品集_21.jpg" alt="(XD) 視覺 21" loading="lazy"></div>
         </div>
-        <button class="xd-carousel-btn prev" aria-label="上一張">&larr;</button>
-        <button class="xd-carousel-btn next" aria-label="下一張">&rarr;</button>
+        <button class="xd-carousel-btn prev" aria-label="上一張">&lsaquo;</button>
+        <button class="xd-carousel-btn next" aria-label="下一張">&rsaquo;</button>
         <div class="xd-carousel-counter"><span class="cur">1</span> / <span class="total">10</span></div>
         <div class="xd-carousel-dots"></div>
       </div>
@@ -204,24 +229,20 @@
         <div class="article-meta-col">
           <h1>(XD)</h1>
           <div class="meta-row">
-            <div class="meta-label">類型</div>
-            <div class="meta-value">畢業展主視覺設計</div>
+            <div class="meta-label">CLIENT</div>
+            <div class="meta-value">國立雲林科技大學 數位媒體設計系 114 級</div>
           </div>
           <div class="meta-row">
-            <div class="meta-label">主辦</div>
-            <div class="meta-value">國立雲林科技大學<br>數位媒體設計系 114 級</div>
-          </div>
-          <div class="meta-row">
-            <div class="meta-label">年份</div>
+            <div class="meta-label">YEAR</div>
             <div class="meta-value">2025</div>
           </div>
           <div class="meta-row">
-            <div class="meta-label">執行團隊</div>
-            <div class="meta-value">林晉維</div>
+            <div class="meta-label">TYPE</div>
+            <div class="meta-value">主視覺</div>
           </div>
           <div class="meta-row">
-            <div class="meta-label">服務項目</div>
-            <div class="meta-value">主視覺規劃 — 識別設計 — 視覺延伸應用</div>
+            <div class="meta-label">CREDITS</div>
+            <div class="meta-value">林晉維</div>
           </div>
         </div>
         <div class="article-text-col">
@@ -246,8 +267,16 @@
   <div class="contact-copyright">&copy; 2026 林晉維 — weiimg.com</div>
 </footer>
 
+<div class="xd-lightbox" id="xdLightbox" aria-hidden="true">
+  <button class="xd-lightbox-btn prev" aria-label="上一張">&lsaquo;</button>
+  <div class="xd-lightbox-img-wrap"><img src="" alt=""></div>
+  <button class="xd-lightbox-btn next" aria-label="下一張">&rsaquo;</button>
+  <div class="xd-lightbox-counter"><span class="cur">1</span> / <span class="total">10</span></div>
+  <button class="xd-lightbox-close" aria-label="關閉">&times;</button>
+</div>
+
 <script>
-/* Carousel */
+/* Carousel + Lightbox */
 (() => {
   const root = document.getElementById('xdCarousel');
   if (!root) return;
@@ -257,6 +286,12 @@
   const next = root.querySelector('.next');
   const cur = root.querySelector('.cur');
   const dotsWrap = root.querySelector('.xd-carousel-dots');
+  const lightbox = document.getElementById('xdLightbox');
+  const lightboxImg = lightbox ? lightbox.querySelector('img') : null;
+  const lightboxCurEl = lightbox ? lightbox.querySelector('.cur') : null;
+  const lightboxPrev = lightbox ? lightbox.querySelector('.xd-lightbox-btn.prev') : null;
+  const lightboxNext = lightbox ? lightbox.querySelector('.xd-lightbox-btn.next') : null;
+  const lightboxClose = lightbox ? lightbox.querySelector('.xd-lightbox-close') : null;
   let idx = 0;
   const total = slides.length;
 
@@ -273,16 +308,20 @@
   function go(n) {
     idx = (n + total) % total;
     track.style.transform = `translateX(-${idx * 100}%)`;
-    cur.textContent = idx + 1;
+    if (cur) cur.textContent = idx + 1;
     dots.forEach((d, i) => d.classList.toggle('on', i === idx));
     thumbs.forEach((t, i) => t.classList.toggle('on', i === idx));
     const active = thumbs[idx];
     if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (lightbox && lightbox.classList.contains('open')) {
+      const img = slides[idx].querySelector('img');
+      if (img && lightboxImg) lightboxImg.src = img.src;
+      if (lightboxCurEl) lightboxCurEl.textContent = idx + 1;
+    }
   }
-  prev.addEventListener('click', () => go(idx - 1));
-  next.addEventListener('click', () => go(idx + 1));
+  prev.addEventListener('click', e => { e.stopPropagation(); go(idx - 1); });
+  next.addEventListener('click', e => { e.stopPropagation(); go(idx + 1); });
 
-  /* Keyboard */
   root.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') go(idx - 1);
     if (e.key === 'ArrowRight') go(idx + 1);
@@ -290,17 +329,13 @@
   root.tabIndex = 0;
 
   /* Drag / swipe */
-  let startX = 0, dx = 0, dragging = false;
-  const onDown = e => {
-    dragging = true;
-    startX = (e.touches ? e.touches[0].clientX : e.clientX);
-    track.classList.add('dragging');
-  };
+  let startX = 0, dx = 0, dragging = false, moved = false;
+  const onDown = e => { dragging = true; moved = false; startX = (e.touches ? e.touches[0].clientX : e.clientX); track.classList.add('dragging'); };
   const onMove = e => {
     if (!dragging) return;
     const x = (e.touches ? e.touches[0].clientX : e.clientX);
     dx = x - startX;
-    const w = root.offsetWidth;
+    if (Math.abs(dx) > 5) moved = true;
     track.style.transform = `translateX(calc(-${idx * 100}% + ${dx}px))`;
   };
   const onUp = () => {
@@ -308,11 +343,8 @@
     dragging = false;
     track.classList.remove('dragging');
     const w = root.offsetWidth;
-    if (Math.abs(dx) > w * 0.15) {
-      go(idx + (dx < 0 ? 1 : -1));
-    } else {
-      go(idx);
-    }
+    if (Math.abs(dx) > w * 0.15) go(idx + (dx < 0 ? 1 : -1));
+    else go(idx);
     dx = 0;
   };
   root.addEventListener('mousedown', onDown);
@@ -321,6 +353,33 @@
   root.addEventListener('touchstart', onDown, { passive: true });
   root.addEventListener('touchmove', onMove, { passive: true });
   root.addEventListener('touchend', onUp);
+
+  /* Lightbox open on slide click (only if not dragging) */
+  slides.forEach((slide) => {
+    slide.addEventListener('click', () => {
+      if (moved) { moved = false; return; }
+      if (!lightbox || !lightboxImg) return;
+      const img = slide.querySelector('img');
+      if (!img) return;
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt || '';
+      if (lightboxCurEl) lightboxCurEl.textContent = idx + 1;
+      lightbox.classList.add('open');
+    });
+  });
+  if (lightbox) {
+    const close = () => lightbox.classList.remove('open');
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) close(); });
+    if (lightboxClose) lightboxClose.addEventListener('click', e => { e.stopPropagation(); close(); });
+    if (lightboxPrev) lightboxPrev.addEventListener('click', e => { e.stopPropagation(); go(idx - 1); });
+    if (lightboxNext) lightboxNext.addEventListener('click', e => { e.stopPropagation(); go(idx + 1); });
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') go(idx - 1);
+      else if (e.key === 'ArrowRight') go(idx + 1);
+    });
+  }
 })();
 
 /* Nav slide */

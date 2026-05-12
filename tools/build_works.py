@@ -35,35 +35,21 @@ def render_design(data: dict) -> str:
     for it in data["items"]:
         tag = it["tag"]
         title = it["title"]
-        meta = it.get("meta", "")
         href = it.get("href")
         cover = it.get("cover")
-        if href:
-            classes = "brand-card has-img" if cover else "brand-card"
-            out.append(f'    <a href="{h(href)}" class="{classes}" data-tag="{h(tag)}">')
-            if cover:
-                out.append(
-                    f"      <div class=\"brand-card-img\" style=\"background-image:url('{h(cover)}');\"></div>"
-                )
-            out.append(f'      <span class="bc-tag">{h(tag)}</span>')
-            out.append('      <div class="hover-overlay">')
-            out.append(f'        <div class="hover-title">{h(title)}</div>')
-            out.append(f'        <div class="hover-meta">{h(meta)}</div>')
-            out.append("      </div>")
-            out.append("    </a>")
-        else:
-            classes = "brand-card has-img" if cover else "brand-card"
-            out.append(f'    <div class="{classes}" data-tag="{h(tag)}">')
-            if cover:
-                out.append(
-                    f"      <div class=\"brand-card-img\" style=\"background-image:url('{h(cover)}');\"></div>"
-                )
-            out.append(f'      <span class="bc-tag">{h(tag)}</span>')
-            out.append('      <div class="hover-overlay">')
-            out.append(f'        <div class="hover-title">{h(title)}</div>')
-            out.append(f'        <div class="hover-meta">{h(meta)}</div>')
-            out.append("      </div>")
-            out.append("    </div>")
+        el, close = ("a", "a") if href else ("div", "div")
+        href_attr = f' href="{h(href)}"' if href else ""
+        classes = "brand-card has-img" if cover else "brand-card"
+        out.append(f'    <{el}{href_attr} class="{classes}" data-tag="{h(tag)}">')
+        if cover:
+            out.append(
+                f"      <div class=\"brand-card-img\" style=\"background-image:url('{h(cover)}');\"></div>"
+            )
+        out.append(f'      <span class="bc-tag">{h(tag)}</span>')
+        out.append('      <div class="hover-overlay">')
+        out.append(f'        <div class="hover-title">{h(title)}</div>')
+        out.append("      </div>")
+        out.append(f"    </{close}>")
     out.append("  </div>")
     return "\n".join(out)
 
