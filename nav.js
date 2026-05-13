@@ -64,3 +64,23 @@
   wrap.addEventListener('mouseleave', hide);
   wrap.querySelectorAll('.nav-row:last-child a').forEach(a => a.addEventListener('mouseenter', show));
 })();
+
+/* Mobile nav: auto-hide on scroll-down, show on scroll-up.
+   CSS handles the slide via body.nav-hide → .nav { transform: translateY(-100%) } */
+(() => {
+  if (!matchMedia('(max-width: 768px)').matches) return;
+  let lastY = window.scrollY;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const y = window.scrollY;
+    const dy = y - lastY;
+    if (Math.abs(dy) < 4) return;
+    if (dy > 0 && y > 56) document.body.classList.add('nav-hide');
+    else if (dy < 0) document.body.classList.remove('nav-hide');
+    lastY = y;
+  };
+  window.addEventListener('scroll', () => {
+    if (!raf) raf = requestAnimationFrame(update);
+  }, { passive: true });
+})();
