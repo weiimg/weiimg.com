@@ -893,7 +893,7 @@ body.inner-page main {
 /* ===== Filter Bar + Work Grid (P4, P5) ===== */
 .filter-bar {
   position: sticky;
-  top: 0;
+  top: 56px;
   background: var(--black);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -1382,12 +1382,14 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
 @media (max-width: 768px) {
   /* ----- Nav: hamburger + fullscreen overlay ----- */
   .nav {
-    padding: 14px 20px;
+    padding: calc(14px + env(safe-area-inset-top)) 20px 14px;
     min-height: 56px;
     z-index: 101;
     background: var(--black);
     transform: none !important; /* don't create containing block for fixed children */
   }
+  .filter-bar { top: calc(56px + env(safe-area-inset-top)); }
+  body.inner-page main { padding-top: calc(56px + env(safe-area-inset-top)); }
   .nav-logo { font-size: 13px; }
   .nav-logo .arrow-line { display: none; }
   .nav-burger { display: block; }
