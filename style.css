@@ -208,6 +208,7 @@ body::before {
 body.inner-page .nav {
   position: sticky;
   transform: none;
+  padding-top: calc(16px + env(safe-area-inset-top));
 }
 body.inner-page main {
   max-width: 960px;
