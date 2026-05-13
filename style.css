@@ -215,10 +215,10 @@ body::after {
   pointer-events: none;
 }
 body.inner-page .nav {
-  position: sticky;
   transform: none;
 }
 body.inner-page main {
+  padding-top: 56px;
   max-width: 960px;
   margin: 0 auto;
 }
