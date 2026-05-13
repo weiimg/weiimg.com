@@ -205,10 +205,18 @@ body::before {
   transition: transform 0.4s ease;
 }
 .nav.visible { transform: translateY(0); }
+body.inner-page::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: env(safe-area-inset-top);
+  background: #f0f0f0;
+  z-index: 9998;
+  pointer-events: none;
+}
 body.inner-page .nav {
   position: sticky;
   transform: none;
-  padding-top: calc(16px + env(safe-area-inset-top));
 }
 body.inner-page main {
   max-width: 960px;
