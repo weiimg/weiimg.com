@@ -205,7 +205,7 @@ body::before {
   transition: transform 0.4s ease;
 }
 .nav.visible { transform: translateY(0); }
-body.inner-page::after {
+body::after {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0;
