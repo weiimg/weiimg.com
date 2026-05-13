@@ -205,15 +205,6 @@ body::before {
   transition: transform 0.4s ease;
 }
 .nav.visible { transform: translateY(0); }
-body::after {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: env(safe-area-inset-top);
-  background-color: #f0f0f0;
-  z-index: 10000;
-  pointer-events: none;
-}
 body.inner-page .nav {
   transform: none;
 }
@@ -1388,205 +1379,141 @@ body.nav-open .nav-burger span:nth-child(2) { opacity: 0; }
 body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
 /* =====================================================================
-   Mobile RWD
+   Mobile RWD — clean rewrite (2026-05)
+   Strategy: each section is full-bleed with a deliberate background color,
+   so iOS 26 Liquid Glass toolbar sampling produces an intentional tint
+   instead of fighting it with overlays. Nav auto-hides on scroll-down.
    ===================================================================== */
 @media (max-width: 768px) {
-  /* ----- Nav: hamburger + fullscreen overlay ----- */
+
+  /* ---------- Nav: 56px fixed top, default shown, auto-hide on scroll-down ---------- */
   .nav {
     padding: 14px 20px;
-    min-height: 56px;
+    height: 56px;
+    min-height: 0;
     z-index: 101;
     background: var(--black);
-    transform: none !important; /* don't create containing block for fixed children */
+    transform: translateY(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .filter-bar { top: 56px; }
+  body.nav-hide .nav { transform: translateY(-100%); }
+  body.nav-open .nav { transform: translateY(0); }
   .nav-logo { font-size: 13px; }
   .nav-logo .arrow-line { display: none; }
   .nav-burger { display: block; }
+  body.inner-page main { padding-top: 56px; }
 
-  .nav-items {
-    display: none;
-  }
+  /* Hamburger fullscreen overlay */
+  .nav-items { display: none; }
   .nav-items.open {
     display: flex;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100vh;
-    height: 100dvh;
+    inset: 0;
+    height: 100vh; height: 100dvh;
     background: var(--black);
-    flex-direction: column;
-    justify-content: center;
-    align-items: stretch;
-    gap: 0;
+    flex-direction: column; justify-content: center; align-items: stretch;
     padding: 88px 32px 40px;
     z-index: 100;
     overflow-y: auto;
   }
   body.nav-open { overflow: hidden; }
-
-  /* Slide-mask wrap → flat list in overlay */
   .nav-slide-wrap, .nav-slide-inner { all: unset; display: contents; }
   .nav-row {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    height: auto;
-    width: 100%;
+    display: flex; flex-direction: column;
+    align-items: flex-start; gap: 0;
+    width: 100%; height: auto;
   }
-  /* Reorder: WORK section first, then MORE (ABOUT/BLOG), then CONTACT */
   .nav-row:first-child { order: 2; margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.12); }
   .nav-row:last-child { order: 1; }
   .nav-cta-wrap { order: 3; }
-
-  /* Hide the inline WORK span; section labels rendered via ::before */
   .nav-row .has-dropdown { display: none !important; }
   .has-dropdown::after { display: none; }
-
-  /* Section labels */
   .nav-row::before {
     display: block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.25em;
-    color: var(--gray);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.25em; color: var(--gray);
     text-transform: uppercase;
-    padding: 0 0 16px;
-    margin-bottom: 4px;
+    padding: 0 0 16px; margin-bottom: 4px;
   }
   .nav-row:last-child::before { content: "WORK"; }
   .nav-row:first-child::before { content: "MORE"; }
-
-  /* Primary items (DESIGN/FILM/SHORTS) */
-  .nav-row:last-child a {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+  .nav-row a {
     color: var(--white);
     padding: 10px 0;
     text-transform: uppercase;
-    width: 100%;
-    text-align: left;
+    width: 100%; text-align: left;
   }
-  /* Secondary items (ABOUT/BLOG) */
-  .nav-row:first-child a {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--white);
-    padding: 10px 0;
-    text-transform: uppercase;
-    width: 100%;
-    text-align: left;
-  }
-
-  .nav-cta-wrap {
-    margin: 32px 0 0;
-    width: 100%;
-    padding-top: 32px;
-    border-top: 1px solid rgba(255,255,255,0.12);
-  }
+  .nav-row:last-child a { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; }
+  .nav-row:first-child a { font-size: 22px; font-weight: 700; }
+  .nav-cta-wrap { margin: 32px 0 0; width: 100%; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.12); }
   .nav-cta-wrap::before {
     content: "CONTACT";
     display: block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.25em;
-    color: var(--gray);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.25em; color: var(--gray);
     text-transform: uppercase;
     margin-bottom: 16px;
   }
   .nav-cta {
-    display: block;
-    padding: 16px 0;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    border: 1px solid var(--white);
-    text-align: center;
-    width: 100%;
-    color: var(--white);
+    display: block; padding: 16px 0;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.2em;
+    border: 1px solid var(--white); text-align: center;
+    width: 100%; color: var(--white);
   }
   .nav-cta:hover { background: var(--white); color: var(--black); border-color: var(--white); }
   .findme-dropdown {
-    position: static;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    background: transparent;
-    border: 0;
-    margin-top: 16px;
-    min-width: 0;
-    box-shadow: none;
-    display: flex;
-    flex-direction: column;
+    position: static; opacity: 1; visibility: visible; transform: none;
+    background: transparent; border: 0; margin-top: 16px;
+    min-width: 0; box-shadow: none;
+    display: flex; flex-direction: column;
   }
   .findme-dropdown a {
-    border-bottom: 0;
-    justify-content: flex-start;
-    font-size: 14px;
-    padding: 10px 0;
-    color: var(--gray-light);
+    border-bottom: 0; justify-content: flex-start;
+    font-size: 14px; padding: 10px 0; color: var(--gray-light);
   }
 
-  body.inner-page main { padding-top: 56px; }
-
-  /* ----- Hero (P1) — full viewport on mobile ----- */
+  /* ---------- Hero (landing) ---------- */
   .hero {
     padding: 0 20px;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column;
     justify-content: flex-end;
-    align-items: stretch;
     position: relative;
   }
   .hero-brand {
     font-size: clamp(72px, 22vw, 140px);
-    bottom: 96px;
-    left: 20px;
+    bottom: 96px; left: 20px;
   }
   .hero-tagline {
-    top: auto;
-    bottom: 200px;
-    right: 20px;
+    top: auto; bottom: 200px; right: 20px;
     padding: 0;
   }
   .hero-micro { font-size: 10px; }
   .hero-micro-zh { font-size: 11px; }
   .hero-ticker {
-    padding: 12px 0;
-    gap: 12px;
-    font-size: 9px;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    white-space: nowrap;
+    padding: 12px 0; gap: 12px; font-size: 9px;
+    flex-wrap: nowrap; overflow: hidden; white-space: nowrap;
   }
   .hero-ticker > * { flex: 0 0 auto; }
   .hero-scroll { bottom: 72px; right: 20px; font-size: 10px; }
   .hero-scroll-arrow { font-size: 28px; }
-
-  /* Landing page only: nav transparent on hero so it visually merges with the gradient */
-  body.landing .nav {
-    background: transparent;
-    border-bottom: 0;
-  }
+  /* Landing: nav stays out of hero so the blue dominates */
+  body.landing .nav { background: transparent; border-bottom: 0; }
   body.landing.nav-open .nav { background: var(--black); }
   body.landing .nav-logo { mix-blend-mode: difference; color: var(--white); }
+  body.landing .nav-burger span { background: #fff; }
 
-  /* ----- Parallax ----- */
+  /* ---------- Parallax video (landing) ---------- */
   .parallax-video { height: 60vh; }
 
-  /* ----- Services (Section 3) — redesigned for mobile ----- */
+  /* ---------- Services (landing) ---------- */
   .services-section {
     grid-template-columns: minmax(0, 1fr);
     min-height: auto;
     padding: 48px 20px;
     gap: 0;
   }
-  .services-nav { display: none; } /* hide sticky scrollspy on mobile */
+  .services-nav { display: none; }
   .services-panels { padding: 0; gap: 16px; }
   .svc-panel {
     min-height: auto;
@@ -1599,79 +1526,113 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   }
   .svc-panel:last-child { margin-bottom: 0; }
   .svc-panel-en { font-size: 10px; margin-bottom: 8px; }
-  .svc-panel-title {
-    font-size: 26px;
-    margin-bottom: 20px;
-  }
+  .svc-panel-title { font-size: 26px; margin-bottom: 20px; }
   .svc-panel-list { margin-bottom: 24px; }
-  .svc-panel-list li {
-    font-size: 14px;
-    padding: 12px 0;
-  }
+  .svc-panel-list li { font-size: 14px; padding: 12px 0; }
   .svc-panel-link { font-size: 12px; }
 
-  /* ----- Stats row ----- */
+  /* ---------- Stats row (landing) ---------- */
   .stats-row { padding: 56px 24px; gap: 36px; grid-template-columns: minmax(0, 1fr); }
   .stat-n { font-size: clamp(72px, 22vw, 110px); line-height: 1; }
   .stat-l { font-size: 12px; letter-spacing: 0.25em; margin-top: 10px; }
 
-  /* ----- Page title ----- */
-  .page-title-block { padding: 48px 20px 24px; }
-  .page-title-block .en { font-size: 10px; }
-  .page-title-block h2 { font-size: 36px; }
+  /* ---------- Page title block (inner pages) ---------- */
+  .page-title-block {
+    padding: 48px 20px 24px;
+    background: var(--black);
+    border-bottom: 1px solid var(--border);
+  }
+  .page-title-block .en { font-size: 11px; letter-spacing: 0.25em; }
+  .page-title-block h2 { font-size: clamp(36px, 10vw, 56px); }
 
-  /* ----- Brand grid ----- */
-  .brand-grid { grid-template-columns: minmax(0, 1fr); padding: 24px 20px; gap: 16px; }
-  .brand-card { aspect-ratio: 4/3; }
+  /* ---------- Filter bar (design / shortform) ---------- */
+  /* Not sticky on mobile — scrolls with content. Prevents sticky-overlap glitches. */
+  .filter-bar {
+    position: static;
+    padding: 16px 20px;
+    gap: 20px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--black);
+    border: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-tag {
+    font-size: 13px;
+    flex: 0 0 auto;
+    padding: 8px 0;
+    border: 0;
+    background: transparent;
+  }
+
+  /* ---------- Brand cards (design grid) ---------- */
+  /* Edge-to-edge single column. Each card fills its own width with the work's color,
+     so when scrolled into view the iOS toolbar samples that color naturally. */
+  .brand-grid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+    gap: 0;
+    background: var(--black);
+  }
+  .brand-card,
+  .brand-grid.cols-3 .brand-card {
+    aspect-ratio: 4/5;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+  .brand-card .bc-tag {
+    top: 16px; left: 16px;
+    font-size: 10px; color: #fff;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 10px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
   .brand-card .hover-title { font-size: 22px; }
 
-  /* ----- Landing contact full-screen + dropdown static ----- */
+  /* ---------- Work grid (film / shortform) ---------- */
+  .work-grid {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0; gap: 0;
+  }
+
+  /* ---------- Landing contact ---------- */
   body.landing .contact { padding: 64px 24px; min-height: 100vh; min-height: 100dvh; }
   .contact-findme { display: block; margin-top: 32px; width: 100%; }
   .contact-findme .contact-cta { display: block; width: 100%; text-align: center; padding: 16px 0; }
   .contact-findme-dropdown {
-    position: static;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    margin-top: 16px;
-    min-width: 0;
-    background: transparent;
-    border: 0;
-    color: #fff;
+    position: static; opacity: 1; visibility: visible; transform: none;
+    margin-top: 16px; min-width: 0;
+    background: transparent; border: 0; color: #fff;
   }
   .contact-findme-dropdown a {
     color: #fff;
     border-bottom: 1px solid rgba(255,255,255,0.15);
-    justify-content: center;
-    padding: 14px 8px;
+    justify-content: center; padding: 14px 8px;
   }
   .contact-findme-dropdown a:last-child { border-bottom: 0; }
   .contact-findme-dropdown a:hover { background: rgba(255,255,255,0.08); }
 
-  /* ----- Article layout (case study pages) ----- */
+  /* ---------- Article layout (case study pages) ---------- */
   .article-layout { padding: 24px 20px; }
-  /* Sidebar fully hidden on mobile; back-link covers navigation */
   .article-sidebar { display: none; }
   .article-back { margin-bottom: 16px; font-size: 13px; }
   .article-carousel-top { padding: 24px 16px; }
   .article-body-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-    padding: 40px 0;
-    border-right: 0;
+    gap: 24px; padding: 40px 0; border-right: 0;
   }
   .article-meta-col { padding-right: 0; border-right: 0; }
   .article-meta-col h1 { font-size: 36px; word-break: keep-all; }
   .meta-row { margin-bottom: 16px; }
   .article-text-col p { font-size: 14px; }
 
-  /* ----- Filter / Work grid (shortform / video) ----- */
-  .filter-bar { padding: 24px 20px; gap: 16px; flex-wrap: wrap; }
-  .filter-tag { font-size: 11px; }
-  .work-grid { grid-template-columns: minmax(0, 1fr); padding: 24px 20px; gap: 16px; }
-
-  /* ----- About ----- */
+  /* ---------- About ---------- */
   .about-hero { grid-template-columns: minmax(0, 1fr); gap: 32px; padding: 48px 20px; }
   .about-intro h1 { font-size: clamp(40px, 10vw, 56px); }
   .about-intro p { font-size: 14px; }
@@ -1680,10 +1641,10 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   .award-row { grid-template-columns: 60px 1fr; gap: 12px; padding: 14px 0; font-size: 13px; }
   .award-row .award-rank { grid-column: 2; opacity: 0.6; font-size: 11px; }
 
-  /* ----- Blog ----- */
+  /* ---------- Blog ---------- */
   .blog-row { grid-template-columns: 80px 1fr; padding: 14px 20px; font-size: 13px; }
 
-  /* ----- (XD) project carousel ----- */
+  /* ---------- XD project carousel ---------- */
   .xd-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
   .xd-carousel-btn.prev { left: 8px; }
   .xd-carousel-btn.next { right: 8px; }
@@ -1692,7 +1653,7 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   .xd-thumbs { gap: 6px; margin-bottom: 32px; }
   .xd-thumb { flex: 0 0 64px; height: 44px; }
 
-  /* ----- Footer / Contact ----- */
+  /* ---------- Footer / Contact section ---------- */
   .contact { padding: 64px 20px; }
   .contact-label { font-size: 12px; margin-bottom: 24px; }
   .contact-cta { margin-top: 32px; padding: 14px 36px; }
@@ -1706,7 +1667,7 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   .nav-items.open .nav-cta { padding: 14px 0; font-size: 11px; }
   .hero-brand { font-size: clamp(48px, 16vw, 88px); }
   .hero-tagline { padding: 16px; }
-  .page-title-block h2 { font-size: 28px; }
+  .page-title-block h2 { font-size: clamp(32px, 12vw, 48px); }
   .article-meta-col h1 { font-size: 28px; }
   .about-intro h1 { font-size: clamp(36px, 12vw, 52px); }
   .contact-email { font-size: clamp(22px, 6vw, 32px); }
