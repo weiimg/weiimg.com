@@ -1027,7 +1027,7 @@ def stub_case_page(
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Inter:wght@100;300;400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
 <style>html{{background:#f0f0f0}}body{{opacity:0;transition:opacity .15s ease-out}}body.ready{{opacity:1}}</style>
-<link rel="stylesheet" href="../../style.css?v=6">
+<link rel="stylesheet" href="../../style.css?v=7">
 <script>addEventListener("load",()=>document.body.classList.add("ready"))</script>
 {CASE_STYLE}
 </head>
