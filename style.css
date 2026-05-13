@@ -149,6 +149,8 @@ body.inner-page,
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { background: #f0f0f0; }
+
 body {
   font-family: 'Inter', 'Noto Sans TC', -apple-system, "Helvetica Neue", sans-serif;
   font-synthesis: none;
@@ -1382,16 +1384,13 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
 @media (max-width: 768px) {
   /* ----- Nav: hamburger + fullscreen overlay ----- */
   .nav {
-    padding: env(safe-area-inset-top) 20px 0;
-    height: calc(56px + env(safe-area-inset-top));
-    min-height: 0;
-    box-sizing: border-box;
+    padding: 14px 20px;
+    min-height: 56px;
     z-index: 101;
     background: var(--black);
     transform: none !important; /* don't create containing block for fixed children */
   }
-  .filter-bar { top: calc(56px + env(safe-area-inset-top)); }
-  body.inner-page main { padding-top: calc(56px + env(safe-area-inset-top)); }
+  .filter-bar { top: 56px; }
   .nav-logo { font-size: 13px; }
   .nav-logo .arrow-line { display: none; }
   .nav-burger { display: block; }
