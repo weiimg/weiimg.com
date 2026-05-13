@@ -1556,14 +1556,13 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   .hero-scroll { bottom: 72px; right: 20px; font-size: 10px; }
   .hero-scroll-arrow { font-size: 28px; }
 
-  /* Nav transparent on hero so it visually merges with the gradient (matches desktop) */
-  .nav {
+  /* Landing page only: nav transparent on hero so it visually merges with the gradient */
+  body.landing .nav {
     background: transparent;
     border-bottom: 0;
   }
-  body.nav-open .nav { background: var(--black); }
-  .nav-logo { color: var(--white); mix-blend-mode: difference; }
-  .nav-burger span { background: var(--white); }
+  body.landing.nav-open .nav { background: var(--black); }
+  body.landing .nav-logo { mix-blend-mode: difference; color: var(--white); }
 
   /* ----- Parallax ----- */
   .parallax-video { height: 60vh; }
