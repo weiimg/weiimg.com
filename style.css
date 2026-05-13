@@ -1424,38 +1424,73 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
     height: auto;
     width: 100%;
   }
-  /* Reorder: work sub-items (DESIGN/FILM/SHORTS) first, then ABOUT/BLOG, then CTA */
-  .nav-row:first-child { order: 2; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+  /* Reorder: WORK section first, then MORE (ABOUT/BLOG), then CONTACT */
+  .nav-row:first-child { order: 2; margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.12); }
   .nav-row:last-child { order: 1; }
   .nav-cta-wrap { order: 3; }
 
-  /* Hide WORK header on mobile — sub-items become primary nav */
+  /* Hide the inline WORK span; section labels rendered via ::before */
   .nav-row .has-dropdown { display: none !important; }
   .has-dropdown::after { display: none; }
 
-  /* All nav links same scale on mobile */
-  .nav-row a {
-    font-size: 22px;
+  /* Section labels */
+  .nav-row::before {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--gray);
+    text-transform: uppercase;
+    padding: 0 0 16px;
+    margin-bottom: 4px;
+  }
+  .nav-row:last-child::before { content: "WORK"; }
+  .nav-row:first-child::before { content: "MORE"; }
+
+  /* Primary items (DESIGN/FILM/SHORTS) */
+  .nav-row:last-child a {
+    font-size: 28px;
     font-weight: 800;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
     color: var(--white);
-    padding: 14px 0;
+    padding: 10px 0;
     text-transform: uppercase;
     width: 100%;
     text-align: left;
   }
-  .nav-row:first-child a { font-size: 16px; font-weight: 500; color: var(--gray-light); padding: 10px 0; }
+  /* Secondary items (ABOUT/BLOG) */
+  .nav-row:first-child a {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    padding: 10px 0;
+    text-transform: uppercase;
+    width: 100%;
+    text-align: left;
+  }
 
   .nav-cta-wrap {
     margin: 32px 0 0;
     width: 100%;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .nav-cta-wrap::before {
+    content: "CONTACT";
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--gray);
+    text-transform: uppercase;
+    margin-bottom: 16px;
   }
   .nav-cta {
     display: block;
-    padding: 14px 0;
-    font-size: 11px;
+    padding: 16px 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
     border: 1px solid var(--white);
     text-align: center;
     width: 100%;
@@ -1469,7 +1504,7 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
     transform: none;
     background: transparent;
     border: 0;
-    margin-top: 12px;
+    margin-top: 16px;
     min-width: 0;
     box-shadow: none;
     display: flex;
@@ -1478,7 +1513,7 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   .findme-dropdown a {
     border-bottom: 0;
     justify-content: flex-start;
-    font-size: 13px;
+    font-size: 14px;
     padding: 10px 0;
     color: var(--gray-light);
   }
@@ -1538,9 +1573,9 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
   .svc-panel-link { font-size: 12px; }
 
   /* ----- Stats row ----- */
-  .stats-row { padding: 64px 24px; gap: 16px; }
-  .stat-n { font-size: clamp(56px, 16vw, 120px); }
-  .stat-l { font-size: 11px; letter-spacing: 0.2em; margin-top: 12px; }
+  .stats-row { padding: 56px 24px; gap: 36px; grid-template-columns: minmax(0, 1fr); }
+  .stat-n { font-size: clamp(72px, 22vw, 110px); line-height: 1; }
+  .stat-l { font-size: 12px; letter-spacing: 0.25em; margin-top: 10px; }
 
   /* ----- Page title ----- */
   .page-title-block { padding: 48px 20px 24px; }
@@ -1628,10 +1663,9 @@ body.nav-open .nav-burger span:nth-child(3) { transform: translateY(-6.5px) rota
 
 @media (max-width: 480px) {
   .nav { padding: 10px 16px; }
-  /* Open-menu sizing kept; small-screen tweaks only */
-  .nav-items.open .nav-row a { font-size: 20px; }
-  .nav-items.open .nav-row:first-child a { font-size: 15px; }
-  .nav-items.open .nav-cta { padding: 13px 0; font-size: 11px; }
+  .nav-items.open .nav-row:last-child a { font-size: 24px; }
+  .nav-items.open .nav-row:first-child a { font-size: 18px; }
+  .nav-items.open .nav-cta { padding: 14px 0; font-size: 11px; }
   .hero-brand { font-size: clamp(48px, 16vw, 88px); }
   .hero-tagline { padding: 16px; }
   .page-title-block h2 { font-size: 28px; }
