@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-   <url>
-      <loc>https://weiimg.com/</loc>
-      <lastmod>2024-05-20</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>1.0</priority>
-   </url>
+  <url><loc>https://weiimg.com/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://weiimg.com/about/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://weiimg.com/film/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://weiimg.com/design/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://weiimg.com/shortform/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://weiimg.com/events/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://weiimg.com/blog/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://weiimg.com/form/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://weiimg.com/quote/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <url><loc>https://weiimg.com/design/liffestore-rebranding/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://weiimg.com/design/yfe-branding/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://weiimg.com/design/yuntech-xd/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <url><loc>https://weiimg.com/blog/2024-fonts/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/2024-recap/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/apple-intelligence/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/chiayi-film/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/freelancer-notes-raw/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/input-output-1/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/my-2024-setups/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/reels-are-not-for-marketing/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/september-books/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/teaching/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/time-management/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://weiimg.com/blog/weiimg/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>
